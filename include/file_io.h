@@ -8,6 +8,7 @@
 #include <string.h> // strlen() fgets() fgetc()
 #include <dirent.h>
 #include <errno.h>
+#include <sys/stat.h> // mkdir()
 
 #include "exit_codes.h"
 
@@ -59,6 +60,32 @@ exit_code_t directory_exists(const char *directory_path);
  * @return exit_code_t 
  */
 exit_code_t directory_empty(const char *directory_path);
+
+/**
+ * @brief Create a directory
+ * 
+ * @param directory_name the name of the directory
+ * @return exit_code_t 
+ */
+exit_code_t create_directory(const char *directory_name);
+
+/**
+ * @brief Create a file
+ * 
+ * @param file_name the name of the file to create
+ * @param mode the mode in which to open the file
+ * @return exit_code_t 
+ */
+exit_code_t create_file(const char *file_name, char mode);
+
+/**
+ * @brief Writes text to a text file
+ * 
+ * @param file_name the name of the file to write to
+ * @param text the text to write
+ * @return exit_code_t 
+ */
+exit_code_t write_to_text_file(const char *file_name, const char *text);
 
 /**
  * @brief Reads a line from a file

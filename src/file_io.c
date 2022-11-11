@@ -175,3 +175,81 @@ exit_code_t directory_empty(const char *directory_path)
 END:
     return exit_code;
 }
+
+exit_code_t create_directory(const char *directory_name)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == directory_name)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    // Attempt to create the directory with full read write and execute permissions
+    if (mkdir(directory_name, 0777) == -1)
+    {
+        exit_code = E_MKDIR_FAILURE;
+        print_exit_message(exit_code);
+        goto END;
+    }
+
+    printf("[%s] directory created successfully\n", directory_name);
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t create_file(const char *file_name, char mode)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == file_name)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    FILE *file; // Create a file pointer
+
+    // Attempt to create a file with the desired file name
+    file = fopen(file_name, mode);
+    if (NULL == file)
+    {
+        exit_code = E_FILE_CREATION_FAILURE;
+        goto END;
+    }
+
+    fclose(file);
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t write_to_text_file(const char *file_name, const char *text)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == file_name || NULL == text)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    FILE *file; // Create a file pointer
+
+    // Attempt to open the file
+    file = fopen(file_name, "w");
+    if (NULL == file)
+    {
+        exit_code = E_FILE_NOT_WRITEABLE;
+        goto END;
+    }
+
+    fprintf(file, text); // Write the text to the file
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}

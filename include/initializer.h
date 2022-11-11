@@ -5,5 +5,6 @@
 #include <stdlib.h>
 
 #include "exit_codes.h"
+#include "file_io.h"
 
 #endif
