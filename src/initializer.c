@@ -4,20 +4,18 @@ exit_code_t initialize_repo(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
+    if (NULL == path)
+    {
+        exit_code = E_NULL_POINTER;
+        print_exit_message(exit_code);
+        goto END;
+    }
+
     char abort_msg[] = "\nCtrl + C detected.\nAborting...\n";
 
     printf("This will initialize the following path as a C repository:\n%s\n\nDo you wish to continue? [Y]/[N]\n", path);
 
-    char input = fgetc(stdin);
-
-    // Check for SIGINT (Ctrl + C)
-    if (true == abort_program)
-    {
-        write(2, abort_msg, strlen(abort_msg));
-        goto END;
-    }
-
-    input = tolower(input);
+    char input = '\0';
 
     while ('y' != input)
     {
@@ -32,7 +30,13 @@ exit_code_t initialize_repo(const char *path)
 
         input = tolower(input);
 
-        if ('n' == input)
+        if ('y' == input)
+        {
+            exit_code = E_SUCCESS;
+            break;
+        }
+
+        else if ('n' == input)
         {
             printf("exiting...\n");
             exit_code = E_SUCCESS;
@@ -87,7 +91,7 @@ exit_code_t create_directories(const char *path)
     char directory_path [1024];
 
     strcpy(directory_path, path);
-    strncat(directory_path, "src", 4);
+    strncat(directory_path, "/src", 5);
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -96,7 +100,7 @@ exit_code_t create_directories(const char *path)
     }
 
     strcpy(directory_path, path);
-    strncat(directory_path, "include", 8);
+    strncat(directory_path, "/include", 9);
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -105,7 +109,7 @@ exit_code_t create_directories(const char *path)
     }
 
     strcpy(directory_path, path);
-    strncat(directory_path, "docs", 5);
+    strncat(directory_path, "/docs", 6);
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -114,7 +118,7 @@ exit_code_t create_directories(const char *path)
     }
 
     strcpy(directory_path, path);
-    strncat(directory_path, "test", 5);
+    strncat(directory_path, "/test", 6);
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -136,7 +140,7 @@ exit_code_t create_gitignore(const char *path)
     const char *gitignore = generate_gitignore();
 
     strcpy(file_path, path);
-    strncat(file_path, ".gitignore", 11);
+    strncat(file_path, "/.gitignore", 12);
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -164,7 +168,7 @@ exit_code_t create_makefile(const char *path)
     const char *Makefile = generate_makefile();
 
     strcpy(file_path, path);
-    strncat(file_path, "Makefile", 9);
+    strncat(file_path, "/Makefile", 10);
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
