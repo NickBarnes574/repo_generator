@@ -53,6 +53,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                 {
                     usage(program_name, 1);
                     exit_code = E_INVALID_INPUT;
+                    print_exit_message(exit_code);
                     goto END;
                 }
 
@@ -78,6 +79,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
         exit_code = directory_exists(directory);
         if (exit_code != E_DIRECTORY_EXISTS)
         {
+            print_exit_message(exit_code);
             goto END;
         }
 
@@ -85,6 +87,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
         exit_code = directory_empty(directory);
         if (exit_code != E_DIRECTORY_EMPTY)
         {
+            print_exit_message(exit_code);
             goto END;
         }
 
