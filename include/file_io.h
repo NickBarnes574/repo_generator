@@ -53,6 +53,14 @@ exit_code_t validate_file(const char *filename);
 exit_code_t directory_exists(const char *directory_path);
 
 /**
+ * @brief Checks if a directory is empty
+ * 
+ * @param directory_path the directory to be passed
+ * @return exit_code_t 
+ */
+exit_code_t directory_empty(const char *directory_path);
+
+/**
  * @brief Reads a line from a file
  * 
  * @param file_ptr the file pointer to be passed

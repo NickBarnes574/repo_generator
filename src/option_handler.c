@@ -68,10 +68,28 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
         }
     }
 
-    char *directory;
+    // Set the directory path only if it exists
+    const char *directory;
     if (optind < argc)
     {
         directory = argv[optind];
+
+        // Check if the directory exists
+        exit_code = directory_exists(directory);
+        if (exit_code != E_DIRECTORY_EXISTS)
+        {
+            goto END;
+        }
+
+        // Check if the directory is empty
+        exit_code = directory_empty(directory);
+        if (exit_code != E_DIRECTORY_EMPTY)
+        {
+            goto END;
+        }
+
+        // Directory is valid so set the directory path
+        options->repo_path = directory;
     }
 
     exit_code = E_SUCCESS;

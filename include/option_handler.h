@@ -8,13 +8,14 @@
 #include <stdint.h>     // unint32_t
 
 #include "exit_codes.h"
+#include "file_io.h"
 
 #define USAGE_FMT_DEFAULT "%s [-c repo_path]\n"
 
 typedef struct 
 {
     bool c_flag;    // Used to set the truth value for the C flag
-    char *repo_path;
+    const char *repo_path;
 } options_t;
 
 /**

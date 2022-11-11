@@ -129,7 +129,7 @@ exit_code_t directory_exists(const char *directory_path)
     if (true == directory)
     {
         closedir(directory);
-        exit_code = E_SUCCESS;
+        exit_code = E_DIRECTORY_EXISTS;
         goto END;
     }
     else if (ENOENT == errno)
@@ -141,6 +141,36 @@ exit_code_t directory_exists(const char *directory_path)
     {
         goto END; // Failed for some unknown reason
     }
+
+END:
+    return exit_code;
+}
+
+exit_code_t directory_empty(const char *directory_path)
+{
+    exit_code_t exit_code = E_DIRECTORY_EMPTY;
+
+    // 1. Check if the directory path is NULL
+    if (NULL == directory_path)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    int num_contents = 0;
+
+    // 2. Read the contents of the directory
+    while (NULL != readdir(directory_path))
+    {
+        // Check if the contents include more than the current and parent directories
+        if (++num_contents > 2)
+        {
+            exit_code = E_DIRECTORY_NOT_EMPTY;
+            goto END;
+        }
+    }
+
+    closedir(directory_path);
 
 END:
     return exit_code;
