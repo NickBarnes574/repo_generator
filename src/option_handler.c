@@ -39,7 +39,6 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
     }
 
     int option = 0;                 // Option used for getopt
-    char *err;                      // Holds anything left over from a conversion
     char program_name[] = "initialize";
 
     while ((option = getopt(argc, argv, "c:")) != -1)

@@ -7,5 +7,7 @@
 #include "exit_codes.h" // for exit codes
 #include "file_io.h" // for file IO operations
 #include "option_handler.h"
+#include "signal_handler.h"
+#include "initializer.h"
 
 #endif

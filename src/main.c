@@ -6,6 +6,9 @@ int main(int argc, char **argv)
 
     options_t *options = NULL;
 
+    // Initialize signal handler
+    signal_setup();
+
     // Initialize option handler
     options = calloc(1, sizeof(options_t));
     if (NULL == options)
@@ -20,6 +23,17 @@ int main(int argc, char **argv)
     {
         goto END;
     }
+
+    const char *path = options->repo_path;
+
+    // Initialize the repo
+    exit_code = initialize_repo(path);
+    if (E_SUCCESS != exit_code)
+    {
+        goto END;
+    }
+
+    exit_code = E_SUCCESS;
 
 END:
     return exit_code;
