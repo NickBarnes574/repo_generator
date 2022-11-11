@@ -20,6 +20,7 @@ exit_message[] =
     {E_FILE_DOES_NOT_EXIST, "File does not exist.\n"},
     {E_FILE_NOT_READABLE, "File cannot be read.\n"},
     {E_FILE_NOT_WRITEABLE, "File cannot be written to.\n"},
+    {E_DIRECTORY_DOES_NOT_EXIST, "Directory does not exist.\n"},
     {E_INVALID_INPUT, "Invalid input.\n"},
     {E_OUT_OF_BOUNDS, "Out of bounds.\n"},
     
