@@ -62,10 +62,10 @@ END:
 
 exit_code_t create_gitignore()
 {
-
+    return E_SUCCESS;
 }
 
 exit_code_t create_makefile()
 {
-
+    return E_SUCCESS;
 }

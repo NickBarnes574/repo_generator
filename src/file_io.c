@@ -126,7 +126,7 @@ exit_code_t directory_exists(const char *directory_path)
     DIR* directory = opendir(directory_path);
 
     // 3. Check if the directory exists
-    if (true == directory)
+    if (NULL != directory)
     {
         closedir(directory);
         exit_code = E_DIRECTORY_EXISTS;
@@ -157,10 +157,17 @@ exit_code_t directory_empty(const char *directory_path)
         goto END;
     }
 
+    DIR *dir = opendir(directory_path);
+    if (NULL == dir)
+    {
+        exit_code = E_DIRECTORY_DOES_NOT_EXIST;
+        goto END;
+    }
+
     int num_contents = 0;
 
     // 2. Read the contents of the directory
-    while (NULL != readdir(directory_path))
+    while (NULL != readdir(dir))
     {
         // Check if the contents include more than the current and parent directories
         if (++num_contents > 2)
@@ -170,7 +177,7 @@ exit_code_t directory_empty(const char *directory_path)
         }
     }
 
-    closedir(directory_path);
+    closedir(dir);
 
 END:
     return exit_code;
@@ -201,7 +208,7 @@ END:
     return exit_code;
 }
 
-exit_code_t create_file(const char *file_name, char mode)
+exit_code_t create_file(const char *file_name, const char *mode)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 

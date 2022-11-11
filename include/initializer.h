@@ -7,4 +7,10 @@
 #include "exit_codes.h"
 #include "file_io.h"
 
+exit_code_t create_directories();
+
+exit_code_t create_gitignore();
+
+exit_code_t create_makefile();
+
 #endif

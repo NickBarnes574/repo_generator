@@ -76,7 +76,7 @@ exit_code_t create_directory(const char *directory_name);
  * @param mode the mode in which to open the file
  * @return exit_code_t 
  */
-exit_code_t create_file(const char *file_name, char mode);
+exit_code_t create_file(const char *file_name, const char *mode);
 
 /**
  * @brief Writes text to a text file
