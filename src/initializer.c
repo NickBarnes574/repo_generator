@@ -1,5 +1,21 @@
 #include "initializer.h"
 
+struct path_list
+{
+    // Directories
+    const char *src;
+    const char *include;
+    const char *docs;
+
+    // Files
+    const char *test;
+    const char *makefile;
+    const char *main_c;
+    const char *main_h;
+    const char *exit_codes_c;
+    const char *exit_codes_h;
+};
+
 exit_code_t initialize_repo(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
@@ -80,7 +96,6 @@ exit_code_t initialize_repo(const char *path)
 
     exit_code = E_SUCCESS;
 END:
-    // TODO: remove all generated content from repo if initialization fails
     return exit_code;
 }
 
@@ -88,19 +103,9 @@ exit_code_t create_directories(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char directory_path [1024];
+    char *directory_path = NULL;
 
-    strcpy(directory_path, path);
-    strncat(directory_path, "/src", 5);
-
-    exit_code = create_directory(directory_path);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
-
-    strcpy(directory_path, path);
-    strncat(directory_path, "/include", 9);
+    directory_path = append_path(path, "src");
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -108,8 +113,7 @@ exit_code_t create_directories(const char *path)
         goto END;
     }
 
-    strcpy(directory_path, path);
-    strncat(directory_path, "/docs", 6);
+    directory_path = append_path(path, "include");
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -117,8 +121,15 @@ exit_code_t create_directories(const char *path)
         goto END;
     }
 
-    strcpy(directory_path, path);
-    strncat(directory_path, "/test", 6);
+    directory_path = append_path(path, "docs");
+
+    exit_code = create_directory(directory_path);
+    if (E_SUCCESS != exit_code)
+    {
+        goto END;
+    }
+
+    directory_path = append_path(path, "test");
 
     exit_code = create_directory(directory_path);
     if (E_SUCCESS != exit_code)
@@ -128,6 +139,7 @@ exit_code_t create_directories(const char *path)
 
     exit_code = E_SUCCESS;
 END:
+    free(directory_path);
     return exit_code;
 }
 
@@ -135,12 +147,11 @@ exit_code_t create_gitignore(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char file_path [1024];
+    char *file_path = NULL;
 
     const char *gitignore = generate_gitignore();
 
-    strcpy(file_path, path);
-    strncat(file_path, "/.gitignore", 12);
+    file_path = append_path(path, ".gitignore");
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -156,6 +167,7 @@ exit_code_t create_gitignore(const char *path)
 
     exit_code = E_SUCCESS;
 END:
+    free(file_path);
     return exit_code;
 }
 
@@ -163,12 +175,11 @@ exit_code_t create_makefile(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char file_path [1024];
+    char *file_path = NULL;
 
     const char *Makefile = generate_makefile();
 
-    strcpy(file_path, path);
-    strncat(file_path, "/Makefile", 10);
+    file_path = append_path(path, "Makefile");
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -184,6 +195,7 @@ exit_code_t create_makefile(const char *path)
 
     exit_code = E_SUCCESS;
 END:
+    free(file_path);
     return exit_code;
 }
 
@@ -191,13 +203,12 @@ exit_code_t create_exit_codes(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char file_path [1024];
+    char *file_path = NULL;
 
     const char *exit_codes_c = generate_exit_codes_c();
     const char *exit_codes_h = generate_exit_codes_h();
 
-    strcpy(file_path, path);
-    strncat(file_path, "/src/exit_codes.c", 18);
+    file_path = append_path(path, "src/exit_codes.c");
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -211,8 +222,7 @@ exit_code_t create_exit_codes(const char *path)
         goto END;
     }
 
-    strcpy(file_path, path);
-    strncat(file_path, "/include/exit_codes.h", 22);
+    file_path = append_path(path, "include/exit_codes.h");
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -228,6 +238,7 @@ exit_code_t create_exit_codes(const char *path)
 
     exit_code = E_SUCCESS;
 END:
+    free(file_path);
     return exit_code;
 }
 
@@ -235,13 +246,12 @@ exit_code_t create_main(const char *path)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char file_path [1024];
+    char *file_path = NULL;
 
     const char *main_c = generate_main_c();
     const char *main_h = generate_main_h();
 
-    strcpy(file_path, path);
-    strncat(file_path, "/src/main.c", 12);
+    file_path = append_path(path, "src/main.c");
 
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -255,8 +265,7 @@ exit_code_t create_main(const char *path)
         goto END;
     }
 
-    strcpy(file_path, path);
-    strncat(file_path, "/include/main.h", 16);
+    file_path = append_path(path, "src/main.h");
     
     exit_code = create_file(file_path, "w");
     if (E_SUCCESS != exit_code)
@@ -272,5 +281,6 @@ exit_code_t create_main(const char *path)
 
     exit_code = E_SUCCESS;
 END:
+    free(file_path);
     return exit_code;
 }

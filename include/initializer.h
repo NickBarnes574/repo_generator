@@ -11,6 +11,8 @@
 #include "file_io.h"
 #include "source_text.h"
 
+typedef struct path_list path_list_t;
+
 exit_code_t initialize_repo(const char *path);
 
 exit_code_t create_directories(const char *path);

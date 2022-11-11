@@ -97,6 +97,23 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name);
 exit_code_t write_to_file(const char *dest_file_name, const char *text);
 
 /**
+ * @brief Remove a file
+ * 
+ * @param file_name the name of the file to remove
+ * @return exit_code_t 
+ */
+exit_code_t remove_file(const char *file_name);
+
+/**
+ * @brief Appends to an existing directory or file path
+ * 
+ * @param source_path the original source path to append
+ * @param dest_name the destination to append to the source
+ * @return const char* 
+ */
+char *append_path(const char *source_path, const char *dest_name);
+
+/**
  * @brief Reads a line from a file
  * 
  * @param file_ptr the file pointer to be passed
