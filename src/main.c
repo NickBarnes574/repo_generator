@@ -36,5 +36,6 @@ int main(int argc, char **argv)
     exit_code = E_SUCCESS;
 
 END:
+    free_options(options);
     return exit_code;
 }
