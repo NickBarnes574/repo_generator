@@ -21,11 +21,13 @@ int main(int argc, char **argv)
     exit_code = process_options(argc, argv, options);
     if (E_SUCCESS != exit_code)
     {
+        printf("here\n");
         goto END;
     }
 
     const char *path = options->repo_path;
 
+    //printf("here\n");
     // Initialize the repo
     exit_code = initialize_repo(path);
     if (E_SUCCESS != exit_code)

@@ -317,3 +317,47 @@ exit_code_t write_to_file(const char *dest_file_name, const char *text)
 END:
     return exit_code;
 }
+
+char *append_path(const char *source_path, const char *dest_name)
+{
+    if (NULL == source_path || NULL == dest_name)
+    {
+        return NULL;
+    }
+
+    // Allocate a path size of up to 256 characters and a NULL terminator
+    char *destination_path = calloc(1, 257);
+    if (NULL == destination_path)
+    {
+        return NULL;
+    }
+
+    strcpy(destination_path, source_path);
+    strncat(destination_path, "/", 2);
+    strncat(destination_path, dest_name, strlen(dest_name) + 1);
+
+    return destination_path;
+}
+
+exit_code_t remove_file(const char *file_name)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    // Check if the file exists before removing it
+    exit_code = file_exists(file_name);
+    if (E_SUCCESS != exit_code)
+    {
+        print_exit_message(exit_code);
+        goto END;
+    }
+
+    // Attempt to remove the file
+    if (0 == remove(file_name))
+    {
+        printf("[%s] successfully removed\n", file_name);
+    }
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
