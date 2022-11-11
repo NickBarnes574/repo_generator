@@ -79,13 +79,22 @@ exit_code_t create_directory(const char *directory_name);
 exit_code_t create_file(const char *file_name, const char *mode);
 
 /**
+ * @brief Copies the contents from a source file to a destination file
+ * 
+ * @param dest_file_name the destination file
+ * @param src_file_name the source file
+ * @return exit_code_t 
+ */
+exit_code_t copy_file(const char *dest_file_name, const char *src_file_name);
+
+/**
  * @brief Writes text to a text file
  * 
- * @param file_name the name of the file to write to
+ * @param dest_file_name the name of the file to write to
  * @param text the text to write
  * @return exit_code_t 
  */
-exit_code_t write_to_text_file(const char *file_name, const char *text);
+exit_code_t write_to_file(const char *dest_file_name, const char *text);
 
 /**
  * @brief Reads a line from a file

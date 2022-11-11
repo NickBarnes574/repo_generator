@@ -234,27 +234,84 @@ END:
     return exit_code;
 }
 
-exit_code_t write_to_text_file(const char *file_name, const char *text)
+exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    if (NULL == file_name || NULL == text)
+    char c;
+
+    if (NULL == dest_file_name || NULL == src_file_name)
     {
         exit_code = E_NULL_POINTER;
         goto END;
     }
 
-    FILE *file; // Create a file pointer
+    FILE *destination; // Create a file pointer for the destination
+    FILE *source; // Create a file pointer for the source
 
-    // Attempt to open the file
-    file = fopen(file_name, "w");
-    if (NULL == file)
+    // Attempt to open the source file for reading
+    source = fopen(src_file_name, "r");
+    if (NULL == source)
     {
-        exit_code = E_FILE_NOT_WRITEABLE;
+        exit_code = E_FILE_NOT_READABLE;
+        print_exit_message(exit_code);
         goto END;
     }
 
-    fprintf(file, text); // Write the text to the file
+    // Attempt to open the destination file for writing
+    destination = fopen(dest_file_name, "w");
+    if (NULL == destination)
+    {
+        exit_code = E_FILE_NOT_WRITEABLE;
+        print_exit_message(exit_code);
+        goto END;
+    }
+
+    // Read contents from souce file into destination file
+    c = fgetc(source);
+    while (c != EOF)
+    {
+        fputc(c, destination);
+        c = fgetc(source);
+    }
+
+    printf("Contents successfully copied to [%s]\n", dest_file_name);
+
+    fclose(source);
+    fclose(destination);
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t write_to_file(const char *dest_file_name, const char *text)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == dest_file_name)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    FILE *destination; // Create a file pointer for the destination
+
+    // Attempt to open the destination file for writing
+    destination = fopen(dest_file_name, "w");
+    if (NULL == destination)
+    {
+        exit_code = E_FILE_NOT_WRITEABLE;
+        print_exit_message(exit_code);
+        goto END;
+    }
+
+    // Copy text string into destination file
+    fputs(text, destination);
+
+    printf("Contents successfully copied to [%s]\n", dest_file_name);
+
+    fclose(destination);
 
     exit_code = E_SUCCESS;
 END:
