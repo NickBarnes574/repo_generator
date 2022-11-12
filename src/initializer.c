@@ -171,45 +171,221 @@ exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths)
     // Check if the 'C' subdirectory exists within the save_data directory
     if (true == options->c_flag)
     {
-        //-----DIRECTORY PATHS-----
-
-        // Create level 1 directory paths
-        src_paths->dir_c = append_path(src_paths->dir_save_data, "C");
-
-        // Create level 2 directory paths
-        src_paths->dir_src = append_path(src_paths->dir_c, "src");
-        src_paths->dir_include = append_path(src_paths->dir_c, "include");
-        src_paths->dir_docs = append_path(src_paths->dir_c, "docs");
-        src_paths->dir_test = append_path(src_paths->dir_c, "test");
-
-        //-----FILE PATHS-----
-
-        // Create source file paths
-        src_paths->file_main_c = append_path(src_paths->dir_src, "main.c");
-        src_paths->file_main_h = append_path(src_paths->dir_include, "main.h");
-        src_paths->file_exit_codes_c = append_path(src_paths->dir_src, "exit_codes.c");
-        src_paths->file_exit_codes_h = append_path(src_paths->dir_include, "exit_codes.h");
-        src_paths->file_test = append_path(src_paths->dir_test, "test.c");
-        src_paths->file_test_all = append_path(src_paths->dir_test, "test_all.c");
-        
-        // Check if the 'C' subdirectory exists
-        exit_code = directory_exists(src_paths->dir_c);
-        if (E_DIRECTORY_EXISTS != exit_code)
+        exit_code = init_c_src_directories(src_paths);
+        if (E_SUCCESS != exit_code)
         {
-            // Create the 'C' subdirectory if it doesn't exist
-            exit_code = create_directory(src_paths->dir_c);
-            if (E_SUCCESS != exit_code)
-            {
-                print_exit_message(exit_code);
-                goto END;
-            }
+            print_exit_message(exit_code);
+            goto END;
+        }
+
+        exit_code = init_c_src_files(src_paths);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
         }
     }
 
     // Attempt to read from save file
-    exit_code = copy_file()
+    //exit_code = copy_file(dest_paths->main)
+
     // If it doesn't exist create one
     printf("---------------------------------------------------------------\n");
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t init_c_src_directories(src_paths_t *src_paths)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    //-----DIRECTORY PATHS-----
+
+    // Create level 1 directory paths
+    src_paths->dir_c = append_path(src_paths->dir_save_data, "C");
+
+    // Create level 2 directory paths
+    src_paths->dir_src = append_path(src_paths->dir_c, "src");
+    src_paths->dir_include = append_path(src_paths->dir_c, "include");
+    src_paths->dir_docs = append_path(src_paths->dir_c, "docs");
+    src_paths->dir_test = append_path(src_paths->dir_c, "test");
+    
+    // Check if the 'C' subdirectory exists
+    exit_code = directory_exists(src_paths->dir_c);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'C' subdirectory if it doesn't exist
+        exit_code = create_directory(src_paths->dir_c);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'src' subdirectory exists
+    exit_code = directory_exists(src_paths->dir_src);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'src' subdirectory if it doesn't exist
+        exit_code = create_directory(src_paths->dir_src);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'include' subdirectory exists
+    exit_code = directory_exists(src_paths->dir_include);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'include' subdirectory if it doesn't exist
+        exit_code = create_directory(src_paths->dir_include);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'docs' subdirectory exists
+    exit_code = directory_exists(src_paths->dir_docs);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'docs' subdirectory if it doesn't exist
+        exit_code = create_directory(src_paths->dir_docs);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'test' subdirectory exists
+    exit_code = directory_exists(src_paths->dir_test);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'test' subdirectory if it doesn't exist
+        exit_code = create_directory(src_paths->dir_test);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t init_c_src_files(src_paths_t *src_paths)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    //-----FILE PATHS-----
+
+    // Create source file paths
+    src_paths->file_main_c = append_path(src_paths->dir_src, "main.c");
+    src_paths->file_main_h = append_path(src_paths->dir_include, "main.h");
+    src_paths->file_exit_codes_c = append_path(src_paths->dir_src, "exit_codes.c");
+    src_paths->file_exit_codes_h = append_path(src_paths->dir_include, "exit_codes.h");
+    src_paths->file_test = append_path(src_paths->dir_test, "test.c");
+    src_paths->file_test_all = append_path(src_paths->dir_test, "test_all.c");
+
+    // Check if 'main.c' exists
+    exit_code = directory_exists(src_paths->file_main_c);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'main.c' if it doesn't exist
+        exit_code = create_directory(src_paths->file_main_c);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'main.h' exists
+    exit_code = directory_exists(src_paths->file_main_h);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'main.h' if it doesn't exist
+        exit_code = create_directory(src_paths->file_main_h);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'main.h' exists
+    exit_code = directory_exists(src_paths->file_main_h);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'main.h' if it doesn't exist
+        exit_code = create_directory(src_paths->file_main_h);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'exit_codes.c' exists
+    exit_code = directory_exists(src_paths->file_exit_codes_c);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'exit_codes.c' if it doesn't exist
+        exit_code = create_directory(src_paths->file_exit_codes_c);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'exit_codes.h' exists
+    exit_code = directory_exists(src_paths->file_exit_codes_h);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'exit_codes.h' if it doesn't exist
+        exit_code = create_directory(src_paths->file_exit_codes_h);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'test.c' exists
+    exit_code = directory_exists(src_paths->file_test);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'test.c' if it doesn't exist
+        exit_code = create_directory(src_paths->file_test);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'test_all.c' exists
+    exit_code = directory_exists(src_paths->file_test_all);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create 'test_all.c' if it doesn't exist
+        exit_code = create_directory(src_paths->file_test_all);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
     exit_code = E_SUCCESS;
 END:
     return exit_code;
