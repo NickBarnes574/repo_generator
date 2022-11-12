@@ -17,6 +17,7 @@ exit_message[] =
     // Other errors are listed by type
 
     //IO
+    {E_FILE_EXISTS, "File exists.\n"},
     {E_FILE_DOES_NOT_EXIST, "File does not exist.\n"},
     {E_FILE_NOT_READABLE, "File cannot be read.\n"},
     {E_FILE_NOT_WRITEABLE, "File cannot be written to.\n"},

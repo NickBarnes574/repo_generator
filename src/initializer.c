@@ -71,7 +71,7 @@ exit_code_t initialize_repo(options_t *options)
         goto END;
     }
 
-    exit_code = initialize_save_data(options, dest_paths);
+    exit_code = initialize_save_data(options, src_paths);
     if (E_SUCCESS != exit_code)
     {
         goto END;
@@ -296,11 +296,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     src_paths->file_test_all = append_path(src_paths->dir_test, "test_all.c");
 
     // Check if 'main.c' exists
-    exit_code = directory_exists(src_paths->file_main_c);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_main_c);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'main.c' if it doesn't exist
-        exit_code = create_directory(src_paths->file_main_c);
+        exit_code = create_file(src_paths->file_main_c, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -309,11 +309,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     }
 
     // Check if 'main.h' exists
-    exit_code = directory_exists(src_paths->file_main_h);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_main_h);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'main.h' if it doesn't exist
-        exit_code = create_directory(src_paths->file_main_h);
+        exit_code = create_file(src_paths->file_main_h, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -322,11 +322,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     }
 
     // Check if 'main.h' exists
-    exit_code = directory_exists(src_paths->file_main_h);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_main_h);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'main.h' if it doesn't exist
-        exit_code = create_directory(src_paths->file_main_h);
+        exit_code = create_file(src_paths->file_main_h, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -335,11 +335,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     }
 
     // Check if 'exit_codes.c' exists
-    exit_code = directory_exists(src_paths->file_exit_codes_c);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_exit_codes_c);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'exit_codes.c' if it doesn't exist
-        exit_code = create_directory(src_paths->file_exit_codes_c);
+        exit_code = create_file(src_paths->file_exit_codes_c, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -348,11 +348,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     }
 
     // Check if 'exit_codes.h' exists
-    exit_code = directory_exists(src_paths->file_exit_codes_h);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_exit_codes_h);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'exit_codes.h' if it doesn't exist
-        exit_code = create_directory(src_paths->file_exit_codes_h);
+        exit_code = create_file(src_paths->file_exit_codes_h, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -361,11 +361,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     }
 
     // Check if 'test.c' exists
-    exit_code = directory_exists(src_paths->file_test);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_test);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'test.c' if it doesn't exist
-        exit_code = create_directory(src_paths->file_test);
+        exit_code = create_file(src_paths->file_test, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -374,11 +374,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     }
 
     // Check if 'test_all.c' exists
-    exit_code = directory_exists(src_paths->file_test_all);
-    if (E_DIRECTORY_EXISTS != exit_code)
+    exit_code = file_exists(src_paths->file_test_all);
+    if (E_FILE_EXISTS != exit_code)
     {
         // Create 'test_all.c' if it doesn't exist
-        exit_code = create_directory(src_paths->file_test_all);
+        exit_code = create_file(src_paths->file_test_all, "w");
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
