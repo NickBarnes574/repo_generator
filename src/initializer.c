@@ -122,9 +122,16 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char *home = getenv("HOME");
-    strcat(home, "/repo_initializer");
-    path_list->repo_initializer = home;
+    // Get the user's home directory
+    const char *home = (const char*)getenv("HOME");
+
+    // Create repo_initializer path
+    path_list->repo_initializer = append_path(home, "repo_initializer");
+    printf("%s\n", path_list->repo_initializer);
+
+    // Create save_data path
+    path_list->save_data = append_path(path_list->repo_initializer, "save_data");
+    printf("%s\n", path_list->save_data);
 
     // Check if the save_data directory exists
     exit_code = directory_exists(path_list->repo_initializer);
@@ -175,10 +182,6 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
             goto END;
         }
 
-        char *repo_init = (char*)path_list->repo_initializer;
-        strcat(repo_init, "/save_data");
-        path_list->save_data = repo_init;
-
         exit_code = create_directory(path_list->save_data);
         if (E_SUCCESS != exit_code)
         {
@@ -190,8 +193,9 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
     // Check if the 'C' subdirectory exists within the save_data directory
     if (true == options->c_flag)
     {
+        // Create C path
         path_list->c = append_path(path_list->save_data, "C");
-    
+        
         // Check if the 'C' subdirectory exists
         exit_code = directory_exists(path_list->c);
         if (E_DIRECTORY_EXISTS != exit_code)
@@ -207,6 +211,8 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
     }
     // Attempt to read from save file
     // If it doesn't exist create one
+
+    exit_code = E_SUCCESS;
 END:
     return exit_code;
 }
