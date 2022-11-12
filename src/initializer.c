@@ -41,30 +41,36 @@ exit_code_t initialize_repo(options_t *options)
 
     printf("This will initialize the following path as a C repository:\n%s\n\nDo you wish to continue? [Y]/[N]\n", path);
 
-    char input = '\0';
+    char *input = calloc(1, sizeof(char *));
 
-    while ('y' != input)
+    while (strcmp("y", input) != 0)
     {
-        input = fgetc(stdin);
+        input = read_line(stdin, input);
 
         // Check for SIGINT (Ctrl + C)
         if (true == abort_program)
         {
             write(2, abort_msg, strlen(abort_msg));
+            free(input);
             goto END;
         }
 
-        input = tolower(input);
-
-        if ('y' == input)
+        for (size_t idx = 0; idx < strlen(input); idx++)
         {
+            input[idx] = tolower(input[idx]);
+        }
+
+        if (strcmp("y", input) == 0)
+        {
+            free(input);
             exit_code = E_SUCCESS;
             break;
         }
 
-        else if ('n' == input)
+        else if (strcmp("n", input) == 0)
         {
             printf("exiting...\n");
+            free(input);
             exit_code = E_SUCCESS;
             goto END;
         }
@@ -139,32 +145,40 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
     {
         char abort_msg[] = "\nCtrl + C detected.\nAborting...\n";
 
-        printf("NOTICE: No save data found...\nTo continue, a new save directory must be initialized.\n\nDo you wish to continue? [Y]/[N]\n");
+        printf("NOTICE: No save data found...\nTo continue, a new save directory must be initialized.\n\
+        A new save directory will be created at the following location:\n%s\
+                \nDo you wish to continue? [Y]/[N]\n", path_list->save_data);
 
-        char input = '\0';
+        char *input = calloc(1, sizeof(char *));
 
-        while ('y' != input)
+        while (strcmp("y", input) != 0)
         {
-            input = fgetc(stdin);
+            input = read_line(stdin, input);
 
             // Check for SIGINT (Ctrl + C)
             if (true == abort_program)
             {
                 write(2, abort_msg, strlen(abort_msg));
+                free(input);
                 goto END;
             }
 
-            input = tolower(input);
-
-            if ('y' == input)
+            for (size_t idx = 0; idx < strlen(input); idx++)
             {
+                input[idx] = tolower(input[idx]);
+            }
+
+            if (strcmp("y", input) == 0)
+            {
+                free(input);
                 exit_code = E_SUCCESS;
                 break;
             }
 
-            else if ('n' == input)
+            else if (strcmp("n", input) == 0)
             {
                 printf("exiting...\n");
+                free(input);
                 exit_code = E_SUCCESS;
                 goto END;
             }
@@ -173,6 +187,8 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
                 printf("Please enter [Y] to continue or [N] to exit\n");
             }
         }
+
+        printf("------INITIALIZING SAVE DIRECTORY------\n");
 
         // Create the repo_initializer directory if it doesn't exist
         exit_code = create_directory(path_list->repo_initializer);
@@ -189,13 +205,17 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
             goto END;
         }
     }
+    else
+    {
+        printf("------SAVE DIRECTORY FOUND------\n");
+    }
 
     // Check if the 'C' subdirectory exists within the save_data directory
     if (true == options->c_flag)
     {
         // Create C path
         path_list->c = append_path(path_list->save_data, "C");
-        
+
         // Check if the 'C' subdirectory exists
         exit_code = directory_exists(path_list->c);
         if (E_DIRECTORY_EXISTS != exit_code)
@@ -211,7 +231,7 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
     }
     // Attempt to read from save file
     // If it doesn't exist create one
-
+    printf("---------------------------------------------------------------\n");
     exit_code = E_SUCCESS;
 END:
     return exit_code;
