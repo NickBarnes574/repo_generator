@@ -102,7 +102,7 @@ char *read_line(FILE *file_ptr, char *buffer)
     */
    
     // 1. Get a line from the file and store it in the buffer
-    char *temp = fgets(buffer, 86, file_ptr);
+    char *temp = fgets(buffer, 256, file_ptr);
     if (temp != NULL)
     {
         buffer[strlen(buffer) - 1] = '\0'; // Sets the newline character to a NULL character
@@ -201,7 +201,7 @@ exit_code_t create_directory(const char *directory_name)
         goto END;
     }
 
-    printf("[%s] directory created successfully\n", directory_name);
+    printf("DIRECTORY: [%s] created successfully\n", directory_name);
 
     exit_code = E_SUCCESS;
 END:
@@ -275,7 +275,7 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
         c = fgetc(source);
     }
 
-    printf("Contents successfully copied to [%s]\n", dest_file_name);
+    printf("FILE: [%s] copy success\n", dest_file_name);
 
     fclose(source);
     fclose(destination);
@@ -309,7 +309,7 @@ exit_code_t write_to_file(const char *dest_file_name, const char *text)
     // Copy text string into destination file
     fputs(text, destination);
 
-    printf("Contents successfully copied to [%s]\n", dest_file_name);
+    printf("FILE: [%s] write success\n", dest_file_name);
 
     fclose(destination);
 
