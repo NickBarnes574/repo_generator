@@ -36,15 +36,11 @@ exit_code_t initialize_repo(options_t *options)
         print_exit_message(exit_code);
         goto END;
     }
-
+    printf("\n----------------NOTICE----------------\n");
     char message[256] = "";
-    if (NULL == message)
-    {
-        printf("fuckoff\n");
-    }
-    strcpy(message, "This will initialize the following path as a C repository:\n");
+    strcpy(message, "This will initialize the following path as a C repository:\n\nREPOSITORY: [");
     strcat(message, path);
-    strcat(message, "\n\nDo you wish to continue? [Y]/[N]\n");
+    strcat(message, "]\n\nDo you wish to continue? [Y]/[N] ");
 
     // Check if the user wants to initialize the input path as a C repository
     exit_code = get_input_yes_no(stdin, message);
@@ -106,21 +102,20 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
 
     // Create repo_initializer path
     path_list->repo_initializer = append_path(home, "repo_initializer");
-    printf("%s\n", path_list->repo_initializer);
 
     // Create save_data path
     path_list->save_data = append_path(path_list->repo_initializer, "save_data");
-    printf("%s\n", path_list->save_data);
 
     // Check if the save_data directory exists
     exit_code = directory_exists(path_list->repo_initializer);
     if (E_DIRECTORY_EXISTS != exit_code)
-    {        
+    {   
+        printf("\n----------------NOTICE----------------\n");
         char message[256] = "";
-        strcpy(message, "NOTICE: No save data found...\nTo continue, a new save directory must be initialized.\n\
-        A new save directory will be created at the following location:\n");
+        strcpy(message, "No save data found...\nTo continue, a new save directory must be initialized.\n");
+        strcat(message, "A new save directory will be created at the following location:\n\nSAVE DIRECTORY: [");
         strcat(message, path_list->save_data);
-        strcat(message, "\nDo you wish to continue? [Y]/[N]\n");
+        strcat(message, "]\n\nDo you wish to continue? [Y]/[N] ");
 
         // Check if the user wants to initialize the input path as a C repository
         exit_code = get_input_yes_no(stdin, message);
@@ -129,7 +124,7 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
             goto END;
         }
 
-        printf("------INITIALIZING SAVE DIRECTORY------\n");
+        printf("\n------INITIALIZING SAVE DIRECTORY------\n");
 
         // Create the repo_initializer directory if it doesn't exist
         exit_code = create_directory(path_list->repo_initializer);
