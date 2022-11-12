@@ -25,11 +25,8 @@ int main(int argc, char **argv)
         goto END;
     }
 
-    const char *path = options->repo_path;
-
-    //printf("here\n");
     // Initialize the repo
-    exit_code = initialize_repo(path);
+    exit_code = initialize_repo(options);
     if (E_SUCCESS != exit_code)
     {
         goto END;

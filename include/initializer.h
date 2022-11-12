@@ -13,16 +13,18 @@
 
 typedef struct path_list path_list_t;
 
-exit_code_t initialize_repo(const char *path);
+exit_code_t initialize_repo(options_t *options);
 
-exit_code_t create_directories(const char *path);
+exit_code_t initialize_save_data(options_t *options, path_list_t *path_list);
 
-exit_code_t create_gitignore(const char *path);
+exit_code_t create_directories(options_t *options);
 
-exit_code_t create_makefile(const char *path);
+exit_code_t create_gitignore(options_t *options);
 
-exit_code_t create_exit_codes(const char *path);
+exit_code_t create_makefile(options_t *options);
 
-exit_code_t create_main(const char *path);
+exit_code_t create_exit_codes(options_t *options);
+
+exit_code_t create_main(options_t *options);
 
 #endif
