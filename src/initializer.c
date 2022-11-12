@@ -1,32 +1,54 @@
 #include "initializer.h"
 
-struct path_list
+struct src_paths
 {
-    // Repo initializer
-    const char *repo_initializer;
-    const char *save_data;
-    const char *c;
-    const char *python;
+    // Level 1 Directories
+    const char *dir_repo_generator;
 
-    // Directories
-    const char *src;
-    const char *include;
-    const char *docs;
+    // Level 2 Directories
+    const char *dir_save_data;
+    const char *dir_c;
+    const char *dir_python;
+
+    // Level 3 Directories
+    const char *dir_src;
+    const char *dir_include;
+    const char *dir_docs;
+    const char *dir_test;
 
     // Files
-    const char *test;
-    const char *makefile;
-    const char *main_c;
-    const char *main_h;
-    const char *exit_codes_c;
-    const char *exit_codes_h;
+    const char *file_test;
+    const char *file_test_all;
+    const char *file_makefile;
+    const char *file_main_c;
+    const char *file_main_h;
+    const char *file_exit_codes_c;
+    const char *file_exit_codes_h;
+};
+
+struct dest_paths
+{
+    // Directories
+    const char *dir_src;
+    const char *dir_include;
+    const char *dir_docs;
+    const char *dir_test;
+
+    // Files
+    const char *file_test;
+    const char *file_makefile;
+    const char *file_main_c;
+    const char *file_main_h;
+    const char *file_exit_codes_c;
+    const char *file_exit_codes_h;
 };
 
 exit_code_t initialize_repo(options_t *options)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    path_list_t *path_list = calloc(1, sizeof(path_list)); // Create a new path list
+    src_paths_t *src_paths = calloc(1, sizeof(src_paths)); // Create a new source paths struct
+    dest_paths_t *dest_paths = calloc(1, sizeof(dest_paths)); // Create a new destination paths struct
 
     const char *path = options->repo_path;
 
@@ -49,7 +71,7 @@ exit_code_t initialize_repo(options_t *options)
         goto END;
     }
 
-    exit_code = initialize_save_data(options, path_list);
+    exit_code = initialize_save_data(options, dest_paths);
     if (E_SUCCESS != exit_code)
     {
         goto END;
@@ -93,28 +115,28 @@ END:
     return exit_code;
 }
 
-exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
+exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
     // Get the user's home directory
     const char *home = (const char*)getenv("HOME");
 
-    // Create repo_initializer path
-    path_list->repo_initializer = append_path(home, "repo_initializer");
+    // Create repo_generator path
+    src_paths->dir_repo_generator = append_path(home, "repo_generator");
 
     // Create save_data path
-    path_list->save_data = append_path(path_list->repo_initializer, "save_data");
+    src_paths->dir_save_data = append_path(src_paths->dir_repo_generator, "save_data");
 
     // Check if the save_data directory exists
-    exit_code = directory_exists(path_list->repo_initializer);
+    exit_code = directory_exists(src_paths->dir_repo_generator);
     if (E_DIRECTORY_EXISTS != exit_code)
     {   
         printf("\n----------------NOTICE----------------\n");
-        char message[256] = "";
+        char message[512] = "";
         strcpy(message, "No save data found...\nTo continue, a new save directory must be initialized.\n");
         strcat(message, "A new save directory will be created at the following location:\n\nSAVE DIRECTORY: [");
-        strcat(message, path_list->save_data);
+        strcat(message, src_paths->dir_save_data);
         strcat(message, "]\n\nDo you wish to continue? [Y]/[N] ");
 
         // Check if the user wants to initialize the input path as a C repository
@@ -127,14 +149,14 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
         printf("\n------INITIALIZING SAVE DIRECTORY------\n");
 
         // Create the repo_initializer directory if it doesn't exist
-        exit_code = create_directory(path_list->repo_initializer);
+        exit_code = create_directory(src_paths->dir_repo_generator);
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
             goto END;
         }
 
-        exit_code = create_directory(path_list->save_data);
+        exit_code = create_directory(src_paths->dir_save_data);
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -149,15 +171,33 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
     // Check if the 'C' subdirectory exists within the save_data directory
     if (true == options->c_flag)
     {
-        // Create C path
-        path_list->c = append_path(path_list->save_data, "C");
+        //-----DIRECTORY PATHS-----
 
+        // Create level 1 directory paths
+        src_paths->dir_c = append_path(src_paths->dir_save_data, "C");
+
+        // Create level 2 directory paths
+        src_paths->dir_src = append_path(src_paths->dir_c, "src");
+        src_paths->dir_include = append_path(src_paths->dir_c, "include");
+        src_paths->dir_docs = append_path(src_paths->dir_c, "docs");
+        src_paths->dir_test = append_path(src_paths->dir_c, "test");
+
+        //-----FILE PATHS-----
+
+        // Create source file paths
+        src_paths->file_main_c = append_path(src_paths->dir_src, "main.c");
+        src_paths->file_main_h = append_path(src_paths->dir_include, "main.h");
+        src_paths->file_exit_codes_c = append_path(src_paths->dir_src, "exit_codes.c");
+        src_paths->file_exit_codes_h = append_path(src_paths->dir_include, "exit_codes.h");
+        src_paths->file_test = append_path(src_paths->dir_test, "test.c");
+        src_paths->file_test_all = append_path(src_paths->dir_test, "test_all.c");
+        
         // Check if the 'C' subdirectory exists
-        exit_code = directory_exists(path_list->c);
+        exit_code = directory_exists(src_paths->dir_c);
         if (E_DIRECTORY_EXISTS != exit_code)
         {
             // Create the 'C' subdirectory if it doesn't exist
-            exit_code = create_directory(path_list->c);
+            exit_code = create_directory(src_paths->dir_c);
             if (E_SUCCESS != exit_code)
             {
                 print_exit_message(exit_code);
@@ -165,7 +205,9 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
             }
         }
     }
+
     // Attempt to read from save file
+    exit_code = copy_file()
     // If it doesn't exist create one
     printf("---------------------------------------------------------------\n");
     exit_code = E_SUCCESS;
