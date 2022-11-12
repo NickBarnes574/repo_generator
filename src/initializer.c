@@ -37,47 +37,20 @@ exit_code_t initialize_repo(options_t *options)
         goto END;
     }
 
-    char abort_msg[] = "\nCtrl + C detected.\nAborting...\n";
-
-    printf("This will initialize the following path as a C repository:\n%s\n\nDo you wish to continue? [Y]/[N]\n", path);
-
-    char *input = calloc(1, sizeof(char *));
-
-    while (strcmp("y", input) != 0)
+    char message[256] = "";
+    if (NULL == message)
     {
-        input = read_line(stdin, input);
+        printf("fuckoff\n");
+    }
+    strcpy(message, "This will initialize the following path as a C repository:\n");
+    strcat(message, path);
+    strcat(message, "\n\nDo you wish to continue? [Y]/[N]\n");
 
-        // Check for SIGINT (Ctrl + C)
-        if (true == abort_program)
-        {
-            write(2, abort_msg, strlen(abort_msg));
-            free(input);
-            goto END;
-        }
-
-        for (size_t idx = 0; idx < strlen(input); idx++)
-        {
-            input[idx] = tolower(input[idx]);
-        }
-
-        if (strcmp("y", input) == 0)
-        {
-            free(input);
-            exit_code = E_SUCCESS;
-            break;
-        }
-
-        else if (strcmp("n", input) == 0)
-        {
-            printf("exiting...\n");
-            free(input);
-            exit_code = E_SUCCESS;
-            goto END;
-        }
-        else
-        {
-            printf("Please enter [Y] to continue or [N] to exit\n");
-        }
+    // Check if the user wants to initialize the input path as a C repository
+    exit_code = get_input_yes_no(stdin, message);
+    if (E_YES != exit_code)
+    {
+        goto END;
     }
 
     exit_code = initialize_save_data(options, path_list);
@@ -142,50 +115,18 @@ exit_code_t initialize_save_data(options_t *options, path_list_t *path_list)
     // Check if the save_data directory exists
     exit_code = directory_exists(path_list->repo_initializer);
     if (E_DIRECTORY_EXISTS != exit_code)
-    {
-        char abort_msg[] = "\nCtrl + C detected.\nAborting...\n";
+    {        
+        char message[256] = "";
+        strcpy(message, "NOTICE: No save data found...\nTo continue, a new save directory must be initialized.\n\
+        A new save directory will be created at the following location:\n");
+        strcat(message, path_list->save_data);
+        strcat(message, "\nDo you wish to continue? [Y]/[N]\n");
 
-        printf("NOTICE: No save data found...\nTo continue, a new save directory must be initialized.\n\
-        A new save directory will be created at the following location:\n%s\
-                \nDo you wish to continue? [Y]/[N]\n", path_list->save_data);
-
-        char *input = calloc(1, sizeof(char *));
-
-        while (strcmp("y", input) != 0)
+        // Check if the user wants to initialize the input path as a C repository
+        exit_code = get_input_yes_no(stdin, message);
+        if (E_YES != exit_code)
         {
-            input = read_line(stdin, input);
-
-            // Check for SIGINT (Ctrl + C)
-            if (true == abort_program)
-            {
-                write(2, abort_msg, strlen(abort_msg));
-                free(input);
-                goto END;
-            }
-
-            for (size_t idx = 0; idx < strlen(input); idx++)
-            {
-                input[idx] = tolower(input[idx]);
-            }
-
-            if (strcmp("y", input) == 0)
-            {
-                free(input);
-                exit_code = E_SUCCESS;
-                break;
-            }
-
-            else if (strcmp("n", input) == 0)
-            {
-                printf("exiting...\n");
-                free(input);
-                exit_code = E_SUCCESS;
-                goto END;
-            }
-            else
-            {
-                printf("Please enter [Y] to continue or [N] to exit\n");
-            }
+            goto END;
         }
 
         printf("------INITIALIZING SAVE DIRECTORY------\n");

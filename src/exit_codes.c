@@ -28,7 +28,11 @@ exit_message[] =
     {E_MKDIR_FAILURE, "Failed to create directory.\n"},
     {E_INVALID_INPUT, "Invalid input.\n"},
     {E_OUT_OF_BOUNDS, "Out of bounds.\n"},
-    
+
+    //User Input
+    {E_YES, "User input was yes.\n"},
+    {E_NO, "User input was no.\n"},
+
     // Memory Management
     {E_CMR_FAILURE, "Calloc / malloc / realloc failure.\n"},
     {E_NULL_POINTER, "Unexpected NULL pointer detected.\n"},

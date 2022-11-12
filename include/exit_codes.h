@@ -25,6 +25,10 @@ typedef enum exit_code
     E_INVALID_INPUT,
     E_OUT_OF_BOUNDS,
 
+    //User Input
+    E_YES,
+    E_NO,
+
     // Memory Management
     E_CMR_FAILURE,  // Calloc, Malloc, Realloc failure
     E_NULL_POINTER, // Pointer is NULL
