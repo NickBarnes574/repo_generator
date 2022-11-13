@@ -30,7 +30,10 @@ struct src_paths
 
 struct dest_paths
 {
-    // Directories
+    // Level 2 Directories
+    char *dir_repo;
+
+    // Level 2 Directories
     char *dir_src;
     char *dir_include;
     char *dir_docs;
@@ -38,6 +41,7 @@ struct dest_paths
 
     // Files
     char *file_test;
+    char *file_test_all;
     char *file_makefile;
     char *file_main_c;
     char *file_main_h;
@@ -58,18 +62,19 @@ exit_code_t initialize_repo(options_t *options)
         goto END;
     }
 
-    const char *path = options->repo_path;
-
-    if (NULL == path)
+    // const char *path = options->repo_path;
+    dest_paths->dir_repo = options->repo_path;
+    if (NULL == dest_paths->dir_repo)
     {
         exit_code = E_NULL_POINTER;
         print_exit_message(exit_code);
         goto END;
     }
+
     printf("\n----------------NOTICE----------------\n");
     char message[256] = "";
     strcpy(message, "This will initialize the following path as a C repository:\n\nREPOSITORY: [");
-    strcat(message, path);
+    strcat(message, (const char*)dest_paths->dir_repo);
     strcat(message, "]\n\nDo you wish to continue? [Y]/[N] ");
 
     // Check if the user wants to initialize the input path as a C repository
@@ -85,41 +90,25 @@ exit_code_t initialize_repo(options_t *options)
         goto END;
     }
 
-    // exit_code = create_directories(options);
-    // if (E_SUCCESS != exit_code)
-    // {
-    //     goto END;
-    // }
+    exit_code = init_c_dest_directories(dest_paths);
+    if (E_SUCCESS != exit_code)
+    {
+        goto END;
+    }
 
-    // // Line to separate directories and files
-    // printf("---------------------------------------------------------------\n");
-
-    // exit_code = create_gitignore(options);
-    // if (E_SUCCESS != exit_code)
-    // {
-    //     goto END;
-    // }
-
-    // exit_code = create_makefile(options);
-    // if (E_SUCCESS != exit_code)
-    // {
-    //     goto END;
-    // }
-
-    // exit_code = create_exit_codes(options);
-    // if (E_SUCCESS != exit_code)
-    // {
-    //     goto END;
-    // }
-
-    // exit_code = create_main(options);
-    // if (E_SUCCESS != exit_code)
-    // {
-    //     goto END;
-    // }
+    exit_code = init_c_dest_files(dest_paths, src_paths);
+    if (E_SUCCESS != exit_code)
+    {
+        goto END;
+    }
 
     exit_code = E_SUCCESS;
 END:
+
+    /***************************************
+    Free source files and directories
+    ****************************************/
+
     // Free file paths
     free(src_paths->file_exit_codes_c);
     free(src_paths->file_exit_codes_h);
@@ -146,6 +135,27 @@ END:
 
     // Level 1 directories
     free(src_paths->dir_repo_generator);
+
+    /***************************************
+    Free destination files and directories
+    ****************************************/
+
+    // Free file paths
+    free(dest_paths->file_exit_codes_c);
+    free(dest_paths->file_exit_codes_h);
+    free(dest_paths->file_main_c);
+    free(dest_paths->file_main_h);
+    free(dest_paths->file_test);
+    free(dest_paths->file_test_all);
+    free(dest_paths->file_makefile);
+
+    // Free directory paths
+
+    // Level 2 directories
+    free(dest_paths->dir_docs);
+    free(dest_paths->dir_include);
+    free(dest_paths->dir_src);
+    free(dest_paths->dir_test);
 
     // Free structs
     free(src_paths);
@@ -415,6 +425,229 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         if (E_SUCCESS != exit_code)
         {
             printf("test_all.c\n");
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t init_c_dest_directories(dest_paths_t *dest_paths)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    //-----DIRECTORY PATHS-----
+
+    // Create level 2 directory paths
+    dest_paths->dir_src = append_path(dest_paths->dir_repo, "src");
+    dest_paths->dir_include = append_path(dest_paths->dir_repo, "include");
+    dest_paths->dir_docs = append_path(dest_paths->dir_repo, "docs");
+    dest_paths->dir_test = append_path(dest_paths->dir_repo, "test");
+
+    printf("\n----CREATING DESTINATION DIRECTORIES----\n");
+
+    // Check if the 'src' subdirectory exists
+    exit_code = directory_exists(dest_paths->dir_src);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'src' subdirectory if it doesn't exist
+        exit_code = create_directory(dest_paths->dir_src);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'include' subdirectory exists
+    exit_code = directory_exists(dest_paths->dir_include);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'include' subdirectory if it doesn't exist
+        exit_code = create_directory(dest_paths->dir_include);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'docs' subdirectory exists
+    exit_code = directory_exists(dest_paths->dir_docs);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'docs' subdirectory if it doesn't exist
+        exit_code = create_directory(dest_paths->dir_docs);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if the 'test' subdirectory exists
+    exit_code = directory_exists(dest_paths->dir_test);
+    if (E_DIRECTORY_EXISTS != exit_code)
+    {
+        // Create the 'test' subdirectory if it doesn't exist
+        exit_code = create_directory(dest_paths->dir_test);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t init_c_dest_files(dest_paths_t *dest_paths, src_paths_t *src_paths)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    //-----FILE PATHS-----
+
+    // Create source file paths
+    dest_paths->file_main_c = append_path(dest_paths->dir_src, "main.c");
+    dest_paths->file_main_h = append_path(dest_paths->dir_include, "main.h");
+    dest_paths->file_exit_codes_c = append_path(dest_paths->dir_src, "exit_codes.c");
+    dest_paths->file_exit_codes_h = append_path(dest_paths->dir_include, "exit_codes.h");
+    dest_paths->file_test = append_path(dest_paths->dir_test, "test.c");
+    dest_paths->file_test_all = append_path(dest_paths->dir_test, "test_all.c");
+    
+    printf("\n-------CREATING DESTINATION FILES------\n");
+
+    // Check if 'main.c' exists
+    exit_code = file_exists(dest_paths->file_main_c);
+    if (E_FILE_EXISTS != exit_code)
+    {
+        // Create 'main.c' if it doesn't exist
+        exit_code = create_file(dest_paths->file_main_c, "w");
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+
+        // Copy the contents from the source to the destination
+        exit_code = copy_file((const char*)dest_paths->file_main_c, (const char*)src_paths->file_main_c);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'main.h' exists
+    exit_code = file_exists(dest_paths->file_main_h);
+    if (E_FILE_EXISTS != exit_code)
+    {
+        // Create 'main.h' if it doesn't exist
+        exit_code = create_file(dest_paths->file_main_h, "w");
+        if (E_SUCCESS != exit_code)
+        {
+            printf("main.h\n");
+            print_exit_message(exit_code);
+            goto END;
+        }
+    
+        // Copy the contents from the source to the destination
+        exit_code = copy_file((const char*)dest_paths->file_main_h, (const char*)src_paths->file_main_h);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'exit_codes.c' exists
+    exit_code = file_exists(dest_paths->file_exit_codes_c);
+    if (E_FILE_EXISTS != exit_code)
+    {
+        // Create 'exit_codes.c' if it doesn't exist
+        exit_code = create_file(dest_paths->file_exit_codes_c, "w");
+        if (E_SUCCESS != exit_code)
+        {
+            printf("exit_codes.c\n");
+            print_exit_message(exit_code);
+            goto END;
+        }
+
+        // Copy the contents from the source to the destination
+        exit_code = copy_file((const char*)dest_paths->file_exit_codes_c, (const char*)src_paths->file_exit_codes_c);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'exit_codes.h' exists
+    exit_code = file_exists(dest_paths->file_exit_codes_h);
+    if (E_FILE_EXISTS != exit_code)
+    {
+        // Create 'exit_codes.h' if it doesn't exist
+        exit_code = create_file(dest_paths->file_exit_codes_h, "w");
+        if (E_SUCCESS != exit_code)
+        {
+            printf("exit_codes.h\n");
+            print_exit_message(exit_code);
+            goto END;
+        }
+
+        // Copy the contents from the source to the destination
+        exit_code = copy_file((const char*)dest_paths->file_exit_codes_h, (const char*)src_paths->file_exit_codes_h);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'test.c' exists
+    exit_code = file_exists(dest_paths->file_test);
+    if (E_FILE_EXISTS != exit_code)
+    {
+        // Create 'test.c' if it doesn't exist
+        exit_code = create_file(dest_paths->file_test, "w");
+        if (E_SUCCESS != exit_code)
+        {
+            printf("test.c\n");
+            print_exit_message(exit_code);
+            goto END;
+        }
+
+        // Copy the contents from the source to the destination
+        exit_code = copy_file((const char*)dest_paths->file_test, (const char*)src_paths->file_test);
+        if (E_SUCCESS != exit_code)
+        {
+            print_exit_message(exit_code);
+            goto END;
+        }
+    }
+
+    // Check if 'test_all.c' exists
+    exit_code = file_exists(dest_paths->file_test_all);
+    if (E_FILE_EXISTS != exit_code)
+    {
+        // Create 'test_all.c' if it doesn't exist
+        exit_code = create_file(dest_paths->file_test_all, "w");
+        if (E_SUCCESS != exit_code)
+        {
+            printf("test_all.c\n");
+            print_exit_message(exit_code);
+            goto END;
+        }
+
+        // Copy the contents from the source to the destination
+        exit_code = copy_file((const char*)dest_paths->file_test_all, (const char*)src_paths->file_test_all);
+        if (E_SUCCESS != exit_code)
+        {
             print_exit_message(exit_code);
             goto END;
         }

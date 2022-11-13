@@ -25,6 +25,10 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths);
 
 exit_code_t init_c_src_files(src_paths_t *src_paths);
 
+exit_code_t init_c_dest_directories(dest_paths_t *dest_paths);
+
+exit_code_t init_c_dest_files(dest_paths_t *dest_paths, src_paths_t *src_paths);
+
 exit_code_t create_gitignore(options_t *options);
 
 exit_code_t create_makefile(options_t *options);

@@ -268,22 +268,19 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
     }
 
     // Read contents from souce file into destination file
-    char *input = calloc(1, sizeof(char *));
-
-    while (input != NULL)
+    char c = fgetc(source);
+    while (c != EOF)
     {
-        input = read_line(source, input);
-        fputs(input, destination);
+        fputc(c, destination);
+        c = fgetc(source);
     }
 
     printf("FILE: [%s] copy success\n", dest_file_name);
 
-    fclose(source);
-    fclose(destination);
-
     exit_code = E_SUCCESS;
 END:
-    free(input);
+    fclose(source);
+    fclose(destination);
     return exit_code;
 }
 
