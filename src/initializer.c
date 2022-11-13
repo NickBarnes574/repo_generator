@@ -234,11 +234,6 @@ exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths)
         }
     }
 
-    // Attempt to read from save file
-    //exit_code = copy_file(dest_paths->main)
-
-    // If it doesn't exist create one
-    printf("---------------------------------------------------------------\n");
     exit_code = E_SUCCESS;
 END:
     return exit_code;
