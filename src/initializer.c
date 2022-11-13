@@ -3,52 +3,60 @@
 struct src_paths
 {
     // Level 1 Directories
-    const char *dir_repo_generator;
+    char *dir_repo_generator;
 
     // Level 2 Directories
-    const char *dir_save_data;
-    const char *dir_c;
-    const char *dir_python;
+    char *dir_save_data;
 
     // Level 3 Directories
-    const char *dir_src;
-    const char *dir_include;
-    const char *dir_docs;
-    const char *dir_test;
+    char *dir_c;
+    char *dir_python;
+
+    // Level 4 Directories
+    char *dir_src;
+    char *dir_include;
+    char *dir_docs;
+    char *dir_test;
 
     // Files
-    const char *file_test;
-    const char *file_test_all;
-    const char *file_makefile;
-    const char *file_main_c;
-    const char *file_main_h;
-    const char *file_exit_codes_c;
-    const char *file_exit_codes_h;
+    char *file_test;
+    char *file_test_all;
+    char *file_makefile;
+    char *file_main_c;
+    char *file_main_h;
+    char *file_exit_codes_c;
+    char *file_exit_codes_h;
 };
 
 struct dest_paths
 {
     // Directories
-    const char *dir_src;
-    const char *dir_include;
-    const char *dir_docs;
-    const char *dir_test;
+    char *dir_src;
+    char *dir_include;
+    char *dir_docs;
+    char *dir_test;
 
     // Files
-    const char *file_test;
-    const char *file_makefile;
-    const char *file_main_c;
-    const char *file_main_h;
-    const char *file_exit_codes_c;
-    const char *file_exit_codes_h;
+    char *file_test;
+    char *file_makefile;
+    char *file_main_c;
+    char *file_main_h;
+    char *file_exit_codes_c;
+    char *file_exit_codes_h;
 };
 
 exit_code_t initialize_repo(options_t *options)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    src_paths_t *src_paths = calloc(1, sizeof(src_paths)); // Create a new source paths struct
-    dest_paths_t *dest_paths = calloc(1, sizeof(dest_paths)); // Create a new destination paths struct
+    src_paths_t *src_paths = calloc(1, sizeof(src_paths_t)); // Create a new source paths struct
+    dest_paths_t *dest_paths = calloc(1, sizeof(dest_paths_t)); // Create a new destination paths struct
+    if (NULL == src_paths || NULL == dest_paths)
+    {
+        exit_code = E_NULL_POINTER;
+        print_exit_message(exit_code);
+        goto END;
+    }
 
     const char *path = options->repo_path;
 
@@ -77,41 +85,71 @@ exit_code_t initialize_repo(options_t *options)
         goto END;
     }
 
-    exit_code = create_directories(options);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
+    // exit_code = create_directories(options);
+    // if (E_SUCCESS != exit_code)
+    // {
+    //     goto END;
+    // }
 
-    // Line to separate directories and files
-    printf("---------------------------------------------------------------\n");
+    // // Line to separate directories and files
+    // printf("---------------------------------------------------------------\n");
 
-    exit_code = create_gitignore(options);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
+    // exit_code = create_gitignore(options);
+    // if (E_SUCCESS != exit_code)
+    // {
+    //     goto END;
+    // }
 
-    exit_code = create_makefile(options);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
+    // exit_code = create_makefile(options);
+    // if (E_SUCCESS != exit_code)
+    // {
+    //     goto END;
+    // }
 
-    exit_code = create_exit_codes(options);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
+    // exit_code = create_exit_codes(options);
+    // if (E_SUCCESS != exit_code)
+    // {
+    //     goto END;
+    // }
 
-    exit_code = create_main(options);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
+    // exit_code = create_main(options);
+    // if (E_SUCCESS != exit_code)
+    // {
+    //     goto END;
+    // }
 
     exit_code = E_SUCCESS;
 END:
+    // Free file paths
+    free(src_paths->file_exit_codes_c);
+    free(src_paths->file_exit_codes_h);
+    free(src_paths->file_main_c);
+    free(src_paths->file_main_h);
+    free(src_paths->file_test);
+    free(src_paths->file_test_all);
+    free(src_paths->file_makefile);
+
+    // Free directory paths
+
+    // Level 4 directories
+    free(src_paths->dir_docs);
+    free(src_paths->dir_include);
+    free(src_paths->dir_src);
+    free(src_paths->dir_test);
+
+    // Level 3 directories
+    free(src_paths->dir_save_data);
+
+    // Level 2 directories
+    free(src_paths->dir_c);
+    free(src_paths->dir_python);
+
+    // Level 1 directories
+    free(src_paths->dir_repo_generator);
+
+    // Free structs
+    free(src_paths);
+    free(dest_paths);
     return exit_code;
 }
 
@@ -211,6 +249,8 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths)
     src_paths->dir_docs = append_path(src_paths->dir_c, "docs");
     src_paths->dir_test = append_path(src_paths->dir_c, "test");
     
+    printf("\n------CHECKING SOURCE DIRECTORIES------\n");
+
     // Check if the 'C' subdirectory exists
     exit_code = directory_exists(src_paths->dir_c);
     if (E_DIRECTORY_EXISTS != exit_code)
@@ -294,6 +334,8 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     src_paths->file_exit_codes_h = append_path(src_paths->dir_include, "exit_codes.h");
     src_paths->file_test = append_path(src_paths->dir_test, "test.c");
     src_paths->file_test_all = append_path(src_paths->dir_test, "test_all.c");
+    
+    printf("\n---------CHECKING SOURCE FILES--------\n");
 
     // Check if 'main.c' exists
     exit_code = file_exists(src_paths->file_main_c);
@@ -316,19 +358,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_main_h, "w");
         if (E_SUCCESS != exit_code)
         {
-            print_exit_message(exit_code);
-            goto END;
-        }
-    }
-
-    // Check if 'main.h' exists
-    exit_code = file_exists(src_paths->file_main_h);
-    if (E_FILE_EXISTS != exit_code)
-    {
-        // Create 'main.h' if it doesn't exist
-        exit_code = create_file(src_paths->file_main_h, "w");
-        if (E_SUCCESS != exit_code)
-        {
+            printf("main.h\n");
             print_exit_message(exit_code);
             goto END;
         }
@@ -342,6 +372,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_exit_codes_c, "w");
         if (E_SUCCESS != exit_code)
         {
+            printf("exit_codes.c\n");
             print_exit_message(exit_code);
             goto END;
         }
@@ -355,6 +386,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_exit_codes_h, "w");
         if (E_SUCCESS != exit_code)
         {
+            printf("exit_codes.h\n");
             print_exit_message(exit_code);
             goto END;
         }
@@ -368,6 +400,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_test, "w");
         if (E_SUCCESS != exit_code)
         {
+            printf("test.c\n");
             print_exit_message(exit_code);
             goto END;
         }
@@ -381,6 +414,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_test_all, "w");
         if (E_SUCCESS != exit_code)
         {
+            printf("test_all.c\n");
             print_exit_message(exit_code);
             goto END;
         }

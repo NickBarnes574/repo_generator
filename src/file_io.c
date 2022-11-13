@@ -177,9 +177,8 @@ exit_code_t directory_empty(const char *directory_path)
         }
     }
 
-    closedir(dir);
-
 END:
+    closedir(dir);
     return exit_code;
 }
 
@@ -229,6 +228,9 @@ exit_code_t create_file(const char *file_name, const char *mode)
     }
 
     fclose(file);
+
+    printf("FILE: [%s] created successfully\n", file_name);
+
     exit_code = E_SUCCESS;
 END:
     return exit_code;
