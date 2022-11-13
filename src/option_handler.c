@@ -69,7 +69,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
     }
 
     // Set the directory path only if it exists and is empty
-    const char *directory;
+    char *directory;
     if (optind <= argc)
     {
         directory = argv[optind-1];

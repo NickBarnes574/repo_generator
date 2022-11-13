@@ -15,7 +15,7 @@
 typedef struct 
 {
     bool c_flag;    // Used to set the truth value for the C flag
-    const char *repo_path;
+    char *repo_path;
 } options_t;
 
 /**
