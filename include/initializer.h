@@ -12,13 +12,18 @@
 #include "user_input.h"
 #include "source_text.h"
 
-typedef struct path_list path_list_t;
+typedef struct src_paths src_paths_t;
+typedef struct dest_paths dest_paths_t;
 
 exit_code_t initialize_repo(options_t *options);
 
-exit_code_t initialize_save_data(options_t *options, path_list_t *path_list);
+exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths);
 
 exit_code_t create_directories(options_t *options);
+
+exit_code_t init_c_src_directories(src_paths_t *src_paths);
+
+exit_code_t init_c_src_files(src_paths_t *src_paths);
 
 exit_code_t create_gitignore(options_t *options);
 

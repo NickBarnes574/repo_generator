@@ -14,7 +14,7 @@ exit_code_t file_exists(const char *filename)
     // 2. Check if file exists
     if (access(filename, F_OK) == 0) // access() returns 0 upon success
     {
-        exit_code = E_SUCCESS;
+        exit_code = E_FILE_EXISTS;
     }
     else
     {
@@ -61,7 +61,7 @@ exit_code_t validate_file(const char *filename)
 
     // 2. Check if file does not exist
     exit_code = file_exists(filename);
-    if (exit_code != E_SUCCESS)
+    if (exit_code != E_FILE_EXISTS)
     {
         return exit_code;
     }
@@ -177,9 +177,8 @@ exit_code_t directory_empty(const char *directory_path)
         }
     }
 
-    closedir(dir);
-
 END:
+    closedir(dir);
     return exit_code;
 }
 
@@ -229,6 +228,9 @@ exit_code_t create_file(const char *file_name, const char *mode)
     }
 
     fclose(file);
+
+    printf("FILE: [%s] created successfully\n", file_name);
+
     exit_code = E_SUCCESS;
 END:
     return exit_code;
@@ -237,8 +239,6 @@ END:
 exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
-
-    char c;
 
     if (NULL == dest_file_name || NULL == src_file_name)
     {
@@ -268,11 +268,12 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
     }
 
     // Read contents from souce file into destination file
-    c = fgetc(source);
-    while (c != EOF)
+    char *input = calloc(1, sizeof(char *));
+
+    while (input != NULL)
     {
-        fputc(c, destination);
-        c = fgetc(source);
+        input = read_line(source, input);
+        fputs(input, destination);
     }
 
     printf("FILE: [%s] copy success\n", dest_file_name);
@@ -282,6 +283,7 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
 
     exit_code = E_SUCCESS;
 END:
+    free(input);
     return exit_code;
 }
 

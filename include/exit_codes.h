@@ -13,6 +13,7 @@ typedef enum exit_code
     // Other errors are listed by type
 
     // IO
+    E_FILE_EXISTS,
     E_FILE_DOES_NOT_EXIST,
     E_FILE_NOT_READABLE,
     E_FILE_NOT_WRITEABLE,
