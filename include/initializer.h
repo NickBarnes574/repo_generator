@@ -9,6 +9,7 @@
 #include "option_handler.h"
 #include "signal_handler.h"
 #include "file_io.h"
+#include "printer.h"
 #include "user_input.h"
 #include "source_text.h"
 

@@ -6,11 +6,11 @@ VOPTS = --leak-check=full --show-leak-kinds=all --error-exitcode=1 -q
 CFLAGS += -I ./include/ -D_DEFAULT_SOURCE
 
 # all .c files except the .c file that includes main()
-FILES = src/exit_codes.c src/file_io.c src/initializer.c src/option_handler.c src/signal_handler.c src/source_text.c src/user_input.c
+FILES = src/exit_codes.c src/file_io.c src/initializer.c src/option_handler.c src/signal_handler.c src/source_text.c src/user_input.c src/printer.c
 
 # all the the .o files
-OFILES = src/exit_codes.o src/main.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o src/source_text.o src/user_input.o
-OTFILES = src/exit_codes.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o src/source_text.o src/user_input.o
+OFILES = src/exit_codes.o src/main.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o src/source_text.o src/user_input.o src/printer.o
+OTFILES = src/exit_codes.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o src/source_text.o src/user_input.o src/printer.o
 # the name of the output program
 TARGET = initialize_repo
 

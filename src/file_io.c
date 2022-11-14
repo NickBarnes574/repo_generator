@@ -200,8 +200,6 @@ exit_code_t create_directory(const char *directory_name)
         goto END;
     }
 
-    printf("DIRECTORY: [%s] created successfully\n", directory_name);
-
     exit_code = E_SUCCESS;
 END:
     return exit_code;
@@ -228,8 +226,6 @@ exit_code_t create_file(const char *file_name, const char *mode)
     }
 
     fclose(file);
-
-    printf("FILE: [%s] created successfully\n", file_name);
 
     exit_code = E_SUCCESS;
 END:
