@@ -1,16 +1,33 @@
 # required options
-CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla -std=c18
+CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla
 VOPTS = --leak-check=full --show-leak-kinds=all --error-exitcode=1 -q
 
-# put my headers in the compile path
-CFLAGS += -I ./include/ -D_DEFAULT_SOURCE
+# add header files to the compile path
+CFLAGS += -I ./include/
 
-# all .c files except the .c file that includes main()
-FILES = src/exit_codes.c src/file_io.c src/initializer.c src/option_handler.c src/signal_handler.c src/source_text.c src/user_input.c src/printer.c
+# all the the .o (object) files
+OFILES = \
+src/exit_codes.o \
+src/main.o\
+src/file_io.o \
+src/initializer.o \
+src/option_handler.o \
+src/signal_handler.o \
+src/source_text.o \
+src/user_input.o \
+src/printer.o
 
-# all the the .o files
-OFILES = src/exit_codes.o src/main.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o src/source_text.o src/user_input.o src/printer.o
-OTFILES = src/exit_codes.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o src/source_text.o src/user_input.o src/printer.o
+# all the the .o (object) files except the .o file that includes main(). Used for running unit tests.
+TEST_OFILES = \
+src/exit_codes.o \
+src/file_io.o \
+src/initializer.o \
+src/option_handler.o \
+src/signal_handler.o \
+src/source_text.o \
+src/user_input.o \
+src/printer.o
+
 # the name of the output program
 TARGET = initialize_repo
 
@@ -26,7 +43,6 @@ all: $(OFILES) $(TARGET)
 
 # makes the program
 .PHONY: initialize_repo
-
 initialize_repo: $(OFILES)
 		$(CC) $(CFLAGS) $(OFILES) -o $(TARGET)
 
@@ -36,7 +52,7 @@ profile: clean
 profile: CFLAGS += -pg
 profile: initialize_repo
 
-# makes a debug version of the program
+# makes a debug version of the program for use with valgrind
 .PHONY: debug
 debug: CFLAGS += -g -gstabs -O0
 debug: initialize_repo
@@ -63,5 +79,5 @@ check: test/initialize_repo_tests
 
 # Comprehensive test testing all dependencies
 test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit
-test/initialize_repo_tests: $(ALL_TESTS) $(OTFILES)
-	$(CC) $(CFLAGS) $(ALL_TESTS) $(OTFILES) $(CHECKLIBS) -o test/initialize_repo_tests
+test/initialize_repo_tests: $(ALL_TESTS) $(TEST_OFILES)
+	$(CC) $(CFLAGS) $(ALL_TESTS) $(TEST_OFILES) $(CHECKLIBS) -o test/initialize_repo_tests

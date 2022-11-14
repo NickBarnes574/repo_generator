@@ -1,5 +1,6 @@
 #include "initializer.h"
 
+// TODO: Turn src_paths struct into char** in order to allow any number of destination paths to be implemented
 struct src_paths
 {
     // Level 1 Directories
@@ -28,6 +29,7 @@ struct src_paths
     char *file_exit_codes_h;
 };
 
+// TODO: Turn dest_paths struct into char** in order to allow any number of destination paths to be implemented
 struct dest_paths
 {
     // Level 2 Directories
@@ -177,12 +179,13 @@ exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths)
     src_paths->dir_save_data = append_path(src_paths->dir_repo_generator, "save_data");
 
     // Check if the save_data directory exists
+    printf("\n--------CHECKING SAVE DIRECTORY--------\n");
     exit_code = directory_exists(src_paths->dir_repo_generator);
     if (E_DIRECTORY_EXISTS != exit_code)
     {   
-        printf("\n----------------NOTICE----------------\n");
+        printf("\nNOTICE: [NO SAVE DATA FOUND]\n\n");
         char message[512] = "";
-        strcpy(message, "No save data found...\nTo continue, a new save directory must be initialized.\n");
+        strcpy(message, "To continue, a new save directory must be initialized.\n");
         strcat(message, "A new save directory will be created at the following location:\n\nSAVE DIRECTORY: [");
         strcat(message, src_paths->dir_save_data);
         strcat(message, "]\n\nDo you wish to continue? [Y]/[N] ");
@@ -203,6 +206,7 @@ exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_repo_generator, "CREATED SUCCESSFULLY");
 
         exit_code = create_directory(src_paths->dir_save_data);
         if (E_SUCCESS != exit_code)
@@ -210,10 +214,11 @@ exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_save_data, "CREATED SUCCESSFULLY");
     }
     else
     {
-        printf("------SAVE DIRECTORY FOUND------\n");
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_repo_generator, "OK");
     }
 
     // Check if the 'C' subdirectory exists within the save_data directory

@@ -61,79 +61,67 @@ const char *generate_gitignore()
     return gitignore;
 }
 
-const char *generate_makefile()
+char *generate_makefile(char ** program_name, char **object_files, char **test_object_files)
 {
-    const char *Makefile =
-    "\n\
-    # required options\n\
-    CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla -std=c18\n\
+    char *Makefile = "";
+
+    strcpy(Makefile, 
+    "# required options\n\
+    CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
     VOPTS = --leak-check=full --show-leak-kinds=all --error-exitcode=1 -q\n\
     \n\
-    # put my headers in the compile path\n\
-    CFLAGS += -I ./include/ -D_DEFAULT_SOURCE\n\
+    # add header files to the compile path\n\
+    CFLAGS += -I ./include/\n\
     \n\
-    # all .c files except the .c file that includes main()\n\
-    FILES = src/exit_codes.c src/file_io.c src/initializer.c src/option_handler.c src/signal_handler.c\n\
-    \n\
-    # all the the .o files\n\
-    OFILES = src/exit_codes.o src/main.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o\n\
-    OTFILES = src/exit_codes.o src/file_io.o src/initializer.o src/option_handler.o src/signal_handler.o\n\
-    # the name of the output program\n\
-    TARGET = initialize_repo\n\
-    \n\
-    # individual tests\n\
-    INITIALIZE_REPO_TESTS = test/initialize_repo_tests.o\n\
-    \n\
-    # combine all the tests into one list\n\
-    ALL_TESTS = test/initialize_repo_test_all.o $(INITIALIZE_REPO_TESTS)\n\
-    \n\
-    # make everything\n\
-    .PHONY: all\n\
-    all: $(OFILES) $(TARGET)\n\
-    \n\
-    # makes the program\n\
-    .PHONY: initialize_repo\n\
-    \n\
-    initialize_repo: $(OFILES)\n\
-            $(CC) $(CFLAGS) $(OFILES) -o $(TARGET)\n\
-    \n\
-    # makes a profile\n\
-    .PHONY: profile\n\
-    profile: clean\n\
-    profile: CFLAGS += -pg\n\
-    profile: initialize_repo\n\
-    \n\
-    # makes a debug version of the program\n\
-    .PHONY: debug\n\
-    debug: CFLAGS += -g -gstabs -O0\n\
-    debug: initialize_repo\n\
-    \n\
-    # delete the library and all the .o files\n\
-    .PHONY: clean\n\
-    clean:\n\
-        $(RM) $(TARGET)\n\
-        find . -type f -name \"*.o\" -exec rm -f {} \\;\n\
-        find . -type f -perm /111 -exec rm -f {} \\;\n\
-    \n\
-    # creates and runs tests using valgrind\n\
-    .PHONY: valcheck\n\
-    valcheck: CFLAGS += -g\n\
-    valcheck: test/initialize_repo_tests\n\
-    # disable forking in order to run tests with valgrind\n\
-        CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\
-    \n\
-    # creates and runs tests\n\
-    .PHONY: check\n\
-    check: CFLAGS += -g\n\
-    check: test/initialize_repo_tests\n\
-        ./$^\n\
-    \n\
-    # Comprehensive test testing all dependencies\n\
-    test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n\
-    test/initialize_repo_tests: $(ALL_TESTS) $(OTFILES)\n\
-        $(CC) $(CFLAGS) $(ALL_TESTS) $(OTFILES) $(CHECKLIBS) -o test/initialize_repo_tests\n\
-    \n\
-    ";
+    # all the the .o (object) files\n\
+    OFILES = \\\n");
+
+    // Adding the object files
+    size_t idx = 0;
+    while (object_files[idx] != NULL)
+    {
+        // Add the object files
+        strcat(Makefile, (const char*)object_files[idx]);
+
+        // Add a continuation
+        if (NULL != object_files[idx + 1])
+        {
+            strcat(Makefile, "\\\n"); // Add "\" and a newline character
+        }
+        else
+        {
+            strcat(Makefile, "\n"); // Just add a newline character
+        }
+    }
+
+    strcat(Makefile,
+    "\n# all the the .o (object) files except the .o file that includes main(). Used for running unit tests.\n");
+
+    // Adding the test object files
+    idx = 0;
+    while (object_files[idx] != NULL)
+    {
+        // Add the object files
+        strcat(Makefile, (const char*)object_files[idx]);
+
+        // Add a continuation
+        if (NULL != object_files[idx + 1])
+        {
+            strcat(Makefile, "\\\n"); // Add "\" and a newline character
+        }
+        else
+        {
+            strcat(Makefile, "\n"); // Just add a newline character
+        }
+    }
+
+    strcat(Makefile, "\n# the name of the output program\n");
+    strcat(Makefile, "TARGET = ");
+    strcat(Makefile, (const char*) program_name);
+    strcat(Makefile, "\n");
+
+    strcat(Makefile, "\n# individual tests");
+    strcat(Makefile, (const char*)toupper(program_name));
 
     return Makefile;
 }
