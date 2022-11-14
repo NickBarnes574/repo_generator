@@ -267,19 +267,11 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_c, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->dir_c);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_c, "OK");
     }
 
     // Check if the 'src' subdirectory exists
@@ -293,19 +285,11 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_src, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->dir_src);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_src, "OK");
     }
 
     // Check if the 'include' subdirectory exists
@@ -319,19 +303,11 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_include, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->dir_include);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_include, "OK");
     }
 
     // Check if the 'docs' subdirectory exists
@@ -345,19 +321,11 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_docs, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->dir_docs);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_docs, "OK");
     }
 
     // Check if the 'test' subdirectory exists
@@ -371,19 +339,11 @@ exit_code_t init_c_src_directories(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_test, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->dir_test);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "DIRECTORY", src_paths->dir_test, "OK");
     }
 
     exit_code = E_SUCCESS;
@@ -418,19 +378,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "FILE", src_paths->file_main_c, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->file_main_c);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "FILE", src_paths->file_main_c, "OK");
     }
 
     // Check if 'main.h' exists
@@ -445,19 +397,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "FILE", src_paths->file_main_h, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->file_main_h);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "FILE", src_paths->file_main_h, "OK");
     }
 
     // Check if 'exit_codes.c' exists
@@ -472,19 +416,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "FILE", src_paths->file_exit_codes_c, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->file_exit_codes_c);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "FILE", src_paths->file_exit_codes_c, "OK");
     }
 
     // Check if 'exit_codes.h' exists
@@ -499,19 +435,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "FILE", src_paths->file_exit_codes_h, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->file_exit_codes_h);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "FILE", src_paths->file_exit_codes_h, "OK");
     }
 
     // Check if 'test.c' exists
@@ -526,19 +454,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "FILE", src_paths->file_test, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->file_test);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "FILE", src_paths->file_test, "OK");
     }
 
     // Check if 'test_all.c' exists
@@ -553,19 +473,11 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
             print_exit_message(exit_code);
             goto END;
         }
+        print_leader_line(stdout, "FILE", src_paths->file_test_all, "CREATED SUCCESSFULLY");
     }
     else
     {
-        char title[256] = "";
-        char data[256] = "";
-
-        strcpy(title, "DIRECTORY: [");
-        strcat(title, src_paths->file_test_all);
-        strcat(title, "]");
-
-        strcpy(data, "[OK]\n");
-
-        print_dots_str(stdout, title, data);
+        print_leader_line(stdout, "FILE", src_paths->file_test_all, "OK");
     }
 
     exit_code = E_SUCCESS;
