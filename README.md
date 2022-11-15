@@ -1,1 +1,1 @@
-# c_repo_initializer
+# repo_initializer
