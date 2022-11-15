@@ -271,8 +271,6 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
         c = fgetc(source);
     }
 
-    printf("FILE: [%s] copy success\n", dest_file_name);
-
     exit_code = E_SUCCESS;
 END:
     fclose(source);
@@ -303,8 +301,6 @@ exit_code_t write_to_file(const char *dest_file_name, const char *text)
 
     // Copy text string into destination file
     fputs(text, destination);
-
-    printf("FILE: [%s] write success\n", dest_file_name);
 
     fclose(destination);
 

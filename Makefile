@@ -1,24 +1,14 @@
 # required options
 CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla
-VOPTS = --leak-check=full --show-leak-kinds=all --error-exitcode=1 -q
 
 # add header files to the compile path
 CFLAGS += -I ./include/
 
-# all the the .o (object) files
-OFILES = \
-src/exit_codes.o \
-src/main.o\
-src/file_io.o \
-src/initializer.o \
-src/option_handler.o \
-src/signal_handler.o \
-src/source_text.o \
-src/user_input.o \
-src/printer.o
+# the object file which contains main
+MAIN_OBJ_FILE = src/main.o
 
-# all the the .o (object) files except the .o file that includes main(). Used for running unit tests.
-TEST_OFILES = \
+# all of the other object files outside of main
+OBJ_FILES = \
 src/exit_codes.o \
 src/file_io.o \
 src/initializer.o \
@@ -32,32 +22,32 @@ src/printer.o
 TARGET = initialize_repo
 
 # individual tests
-INITIALIZE_REPO_TESTS = test/initialize_repo_tests.o
+TEST_OBJ_FILES = test/initialize_repo_tests.o
 
 # combine all the tests into one list
-ALL_TESTS = test/initialize_repo_test_all.o $(INITIALIZE_REPO_TESTS)
+ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)
 
 # make everything
 .PHONY: all
-all: $(OFILES) $(TARGET)
+all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)
 
 # makes the program
-.PHONY: initialize_repo
-initialize_repo: $(OFILES)
-		$(CC) $(CFLAGS) $(OFILES) -o $(TARGET)
+.PHONY: $(TARGET)
+initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)
+		$(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)
+
+# makes a debug version of the program for use with valgrind
+.PHONY: debug
+debug: CFLAGS += -g -gstabs -O0
+debug: $(TARGET)
 
 # makes a profile
 .PHONY: profile
 profile: clean
 profile: CFLAGS += -pg
-profile: initialize_repo
+profile: $(TARGET)
 
-# makes a debug version of the program for use with valgrind
-.PHONY: debug
-debug: CFLAGS += -g -gstabs -O0
-debug: initialize_repo
-
-# delete the library and all the .o files
+# delete the program and all the .o files
 .PHONY: clean
 clean:
 	$(RM) $(TARGET)
@@ -79,5 +69,5 @@ check: test/initialize_repo_tests
 
 # Comprehensive test testing all dependencies
 test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit
-test/initialize_repo_tests: $(ALL_TESTS) $(TEST_OFILES)
-	$(CC) $(CFLAGS) $(ALL_TESTS) $(TEST_OFILES) $(CHECKLIBS) -o test/initialize_repo_tests
+test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)
+	$(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests

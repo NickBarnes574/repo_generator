@@ -18,7 +18,9 @@ const char *generate_gitignore();
  * 
  * @return const char* 
  */
-const char *generate_makefile();
+const char *generate_makefile_single_program();
+
+const char *generate_makefile_multi_program();
 
 /**
  * @brief Generates content for a custom exit_codes.c file

@@ -56,72 +56,160 @@ const char *generate_gitignore()
     Module.symvers\n\
     Mkfile.old\n\
     dkms.conf\n\
+    \n\
+    # Template folder\n\
+    templates/\n\
     ";
 
     return gitignore;
 }
 
-char *generate_makefile(char ** program_name, char **object_files, char **test_object_files)
+const char *generate_makefile_single_program()
 {
-    char *Makefile = "";
+    const char *Makefile =
 
-    strcpy(Makefile, 
     "# required options\n\
     CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
-    VOPTS = --leak-check=full --show-leak-kinds=all --error-exitcode=1 -q\n\
     \n\
     # add header files to the compile path\n\
     CFLAGS += -I ./include/\n\
     \n\
-    # all the the .o (object) files\n\
-    OFILES = \\\n");
+    # the object file which contains main\n\
+    MAIN_OBJ_FILE = src/main.o\n\
+    \n\
+    # all of the other object files outside of main\n\
+    OBJ_FILES = \\\n\
+    src/exit_codes.o \n\
+    \n\
+    # the name of the output program\n\
+    TARGET = #PROGRAM_NAME\n\
+    \n\
+    # individual tests\n\
+    TEST_OBJ_FILES = #test/example_tests.o\n\
+    \n\
+    # combine all the tests into one list\n\
+    ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)\n\
+    \n\
+    # make everything\n\
+    .PHONY: all\n\
+    all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)\n\
+    \n\
+    # makes the program\n\
+    .PHONY: $(TARGET)\n\
+    initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)\n\
+            $(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)\n\
+    \n\
+    # makes a debug version of the program for use with valgrind\n\
+    .PHONY: debug\n\
+    debug: CFLAGS += -g -gstabs -O0\n\
+    debug: $(TARGET)\n\
+    \n\
+    # makes a profile\n\
+    .PHONY: profile\n\
+    profile: clean\n\
+    profile: CFLAGS += -pg\n\
+    profile: $(TARGET)\n\
+    \n\
+    # delete the program and all the .o files\n\
+    .PHONY: clean\n\
+    clean:\n\
+        $(RM) $(TARGET)\n\
+        find . -type f -name \"*.o\" -exec rm -f {} \\;\n\
+        find . -type f -perm /111 -exec rm -f {} \\;\n\
+    \n\
+    # creates and runs tests using valgrind\n\
+    .PHONY: valcheck\n\
+    valcheck: CFLAGS += -g\n\
+    valcheck: test/initialize_repo_tests\n\
+    # disable forking in order to run tests with valgrind\n\
+        CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\
+    \n\
+    # creates and runs tests\n\
+    .PHONY: check\n\
+    check: CFLAGS += -g\n\
+    check: test/initialize_repo_tests\n\
+        ./$^\n\
+    \n\
+    # Comprehensive test testing all dependencies\n\
+    test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n\
+    test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
+        $(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests\n\
+    ";
 
-    // Adding the object files
-    size_t idx = 0;
-    while (object_files[idx] != NULL)
-    {
-        // Add the object files
-        strcat(Makefile, (const char*)object_files[idx]);
+    return Makefile;
+}
 
-        // Add a continuation
-        if (NULL != object_files[idx + 1])
-        {
-            strcat(Makefile, "\\\n"); // Add "\" and a newline character
-        }
-        else
-        {
-            strcat(Makefile, "\n"); // Just add a newline character
-        }
-    }
+const char *generate_makefile_multi_program()
+{
+    const char *Makefile =
 
-    strcat(Makefile,
-    "\n# all the the .o (object) files except the .o file that includes main(). Used for running unit tests.\n");
-
-    // Adding the test object files
-    idx = 0;
-    while (object_files[idx] != NULL)
-    {
-        // Add the object files
-        strcat(Makefile, (const char*)object_files[idx]);
-
-        // Add a continuation
-        if (NULL != object_files[idx + 1])
-        {
-            strcat(Makefile, "\\\n"); // Add "\" and a newline character
-        }
-        else
-        {
-            strcat(Makefile, "\n"); // Just add a newline character
-        }
-    }
-
-    strcat(Makefile, "\n# the name of the output program\n");
-    strcat(Makefile, "TARGET = ");
-    strcat(Makefile, (const char*) program_name);
-    strcat(Makefile, "\n");
-
-    strcat(Makefile, "\n# individual tests");
-    strcat(Makefile, (const char*)toupper(program_name));
+    "# required options\n\
+    CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
+    \n\
+    # add header files to the compile path\n\
+    CFLAGS += -I ./include/\n\
+    \n\
+    # the object file which contains main\n\
+    MAIN_OBJ_FILE = src/main.o\n\
+    \n\
+    # all of the other object files outside of main\n\
+    OBJ_FILES = \\\n\
+    src/exit_codes.o \n\
+    \n\
+    # the name of the output program\n\
+    TARGET = #PROGRAM_NAME\n\
+    \n\
+    # individual tests\n\
+    TEST_OBJ_FILES = #test/example_tests.o\n\
+    \n\
+    # combine all the tests into one list\n\
+    ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)\n\
+    \n\
+    # make everything\n\
+    .PHONY: all\n\
+    all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)\n\
+    \n\
+    # makes the program\n\
+    .PHONY: $(TARGET)\n\
+    initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)\n\
+            $(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)\n\
+    \n\
+    # makes a debug version of the program for use with valgrind\n\
+    .PHONY: debug\n\
+    debug: CFLAGS += -g -gstabs -O0\n\
+    debug: $(TARGET)\n\
+    \n\
+    # makes a profile\n\
+    .PHONY: profile\n\
+    profile: clean\n\
+    profile: CFLAGS += -pg\n\
+    profile: $(TARGET)\n\
+    \n\
+    # delete the program and all the .o files\n\
+    .PHONY: clean\n\
+    clean:\n\
+        $(RM) $(TARGET)\n\
+        find . -type f -name \"*.o\" -exec rm -f {} \\;\n\
+        find . -type f -perm /111 -exec rm -f {} \\;\n\
+    \n\
+    # creates and runs tests using valgrind\n\
+    .PHONY: valcheck\n\
+    valcheck: CFLAGS += -g\n\
+    valcheck: test/initialize_repo_tests\n\
+    # disable forking in order to run tests with valgrind\n\
+        CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\
+    \n\
+    # creates and runs tests\n\
+    .PHONY: check\n\
+    check: CFLAGS += -g\n\
+    check: test/initialize_repo_tests\n\
+        ./$^\n\
+    \n\
+    # Comprehensive test testing all dependencies\n\
+    test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n\
+    test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
+        $(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests\n\
+    ";
 
     return Makefile;
 }
