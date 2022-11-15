@@ -2,7 +2,7 @@
 
 void print_dots_str(FILE *file_ptr, char *title, char *data)
 {
-    const char padder[] = "...........................................................................";
+    const char padder[] = "..............................................................................................";
 
     size_t title_len = strlen(title);
     size_t pad_amount = sizeof(padder) - 1 - title_len;

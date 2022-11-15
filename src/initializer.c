@@ -427,7 +427,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
     src_paths->file_exit_codes_h = append_path(src_paths->dir_include, "exit_codes.h");
     src_paths->file_test = append_path(src_paths->dir_test, "test.c");
     src_paths->file_test_all = append_path(src_paths->dir_test, "test_all.c");
-    src_paths->file_makefile_single = append_path(src_paths->dir_makefiles, "Makefile");
+    src_paths->file_makefile_single = append_path(src_paths->dir_makefile_single, "Makefile");
     src_paths->file_gitignore = append_path(src_paths->dir_c, ".gitignore");
     
     printf("\n---------INITIALIZING SOURCE FILES--------\n");
@@ -557,7 +557,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_makefile_single, "w");
         if (E_SUCCESS != exit_code)
         {
-            printf("test_all.c\n");
+            printf("Makefile\n");
             print_exit_message(exit_code);
             goto END;
         }
@@ -579,7 +579,7 @@ exit_code_t init_c_src_files(src_paths_t *src_paths)
         exit_code = create_file(src_paths->file_gitignore, "w");
         if (E_SUCCESS != exit_code)
         {
-            printf("test_all.c\n");
+            printf(".gitignore\n");
             print_exit_message(exit_code);
             goto END;
         }

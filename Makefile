@@ -19,13 +19,13 @@ src/user_input.o \
 src/printer.o
 
 # the name of the output program
-TARGET = initialize_repo
+TARGET = generate_repo
 
 # individual tests
-TEST_OBJ_FILES = test/initialize_repo_tests.o
+TEST_OBJ_FILES = test/generate_repo_tests.o
 
 # combine all the tests into one list
-ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)
+ALL_TESTS = test/generate_repo_test_all.o $(TEST_OBJ_FILES)
 
 # make everything
 .PHONY: all
@@ -33,7 +33,7 @@ all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)
 
 # makes the program
 .PHONY: $(TARGET)
-initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)
+generate_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)
 		$(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)
 
 # makes a debug version of the program for use with valgrind
@@ -57,17 +57,17 @@ clean:
 # creates and runs tests using valgrind
 .PHONY: valcheck
 valcheck: CFLAGS += -g
-valcheck: test/initialize_repo_tests
+valcheck: test/generate_repo_tests
 # disable forking in order to run tests with valgrind
 	CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^
 
 # creates and runs tests
 .PHONY: check
 check: CFLAGS += -g
-check: test/initialize_repo_tests
+check: test/generate_repo_tests
 	./$^
 
 # Comprehensive test testing all dependencies
-test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit
-test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)
-	$(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests
+test/generate_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit
+test/generate_repo_tests: $(ALL_TESTS) $(OBJ_FILES)
+	$(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/generate_repo_tests
