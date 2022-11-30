@@ -13,9 +13,6 @@
 #include "user_input.h"
 #include "source_text.h"
 
-typedef struct src_paths src_paths_t;
-typedef struct dest_paths dest_paths_t;
-
 exit_code_t initialize_repo(options_t *options);
 
 exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths);

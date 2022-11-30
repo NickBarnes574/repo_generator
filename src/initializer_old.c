@@ -1,10 +1,39 @@
 #include "initializer.h"
 
 // TODO: Turn src_paths struct into char** in order to allow any number of destination paths to be implemented
-char **generate_src_paths()
+struct src_paths
 {
-    char **src_paths = calloc(1, sizeof(char**));
-}
+    // Level 1 Directories
+    char *dir_repo_generator;
+
+    // Level 2 Directories
+    char *dir_save_data;
+
+    // Level 3 Directories
+    char *dir_c;
+    char *dir_python;
+
+    // Level 4 Directories
+    char *dir_src;
+    char *dir_include;
+    char *dir_docs;
+    char *dir_test;
+    char *dir_templates;
+    char *dir_makefiles;
+
+    // Level 5 Directories
+    char *dir_makefile_single;
+
+    // Files
+    char *file_test;
+    char *file_test_all;
+    char *file_makefile_single;
+    char *file_main_c;
+    char *file_main_h;
+    char *file_exit_codes_c;
+    char *file_exit_codes_h;
+    char *file_gitignore;
+};
 
 // TODO: Turn dest_paths struct into char** in order to allow any number of destination paths to be implemented
 struct dest_paths
