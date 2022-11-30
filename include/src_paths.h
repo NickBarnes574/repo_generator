@@ -42,7 +42,7 @@ typedef enum src_codes
              test directory
              ******************/
             DIR_TEST,
-                FILE_TEST,
+                FILE_TESTS,
                 FILE_TEST_ALL,
             
             /******************
@@ -57,10 +57,16 @@ typedef enum src_codes
                     FILE_MAKEFILE_LIBRARY,
 
                 // signal handler templates
-                SIGNAL_HANDLER,
+                DIR_SIGNAL_HANDLER,
                     FILE_SIGNAL_HANDLER_C,
                     FILE_SIGNAL_HANDLER_H,
+
+    NUMBER_OF_CODES,
     
 } src_codes_t;
+
+char **generate_src_paths();
+void free_src_paths(char **src_paths);
+void destroy_src_paths(char **src_paths);
 
 #endif

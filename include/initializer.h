@@ -12,16 +12,26 @@
 #include "printer.h"
 #include "user_input.h"
 #include "source_text.h"
+#include "messages.h"
 
-exit_code_t initialize_repo(options_t *options);
+exit_code_t initialize_repo(options_t *options, char **src_paths);
 
-exit_code_t initialize_save_data(options_t *options, src_paths_t *src_paths);
+exit_code_t initialize_save_data(options_t *options, char **src_paths);
+
+exit_code_t initialize_directory(char *path);
+
+exit_code_t init_c_src_directories(char **src_paths);
+
+exit_code_t initialize_file(char *path, const char *contents);
+
+exit_code_t init_c_src_files(char **src_paths);
+
+
+
+
+
 
 exit_code_t create_directories(options_t *options);
-
-exit_code_t init_c_src_directories(src_paths_t *src_paths);
-
-exit_code_t init_c_src_files(src_paths_t *src_paths);
 
 exit_code_t init_c_dest_directories(dest_paths_t *dest_paths);
 

@@ -9,5 +9,6 @@
 #include "option_handler.h"
 #include "signal_handler.h"
 #include "initializer.h"
+#include "src_paths.h"
 
 #endif
