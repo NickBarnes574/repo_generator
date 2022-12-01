@@ -21,12 +21,8 @@ void destroy_dest_paths(char **dest_paths)
 
 char **generate_dest_paths(const char *path)
 {    
-    // Get the project path from the user
-    char project_path[512] = "";
-    strcpy(project_path, path);
-
     // Allocate space for the path array
-    char **dest_paths = calloc(1, sizeof(char**));
+    char **dest_paths = calloc(DEST_NUMBER_OF_CODES, sizeof(char**));
     if (NULL == dest_paths)
     {
         free (dest_paths);
@@ -35,21 +31,21 @@ char **generate_dest_paths(const char *path)
     }
 
     // Allocate space for each path
-    for (size_t idx = 0; idx < DEST_NUMBER_OF_CODES; idx++)
-    {
-        dest_paths[idx] = calloc(1, sizeof(char*));
-        if (NULL == dest_paths[idx])
-        {
-            destroy_dest_paths(dest_paths);
-            goto END;
-        }
-    }
+    // for (size_t idx = 0; idx < DEST_NUMBER_OF_CODES; idx++)
+    // {
+    //     dest_paths[idx] = calloc(1, sizeof(char*));
+    //     if (NULL == dest_paths[idx])
+    //     {
+    //         destroy_dest_paths(dest_paths);
+    //         goto END;
+    //     }
+    // }
 
     /********************************************************
      * NAME: REPO_GENERATOR
      * PATH: user/home/repo_generator
     *********************************************************/
-    dest_paths[DEST_DIR_REPO] = project_path;
+    dest_paths[DEST_DIR_REPO] = strdup(path);
     const char *repo = dest_paths[DEST_DIR_REPO];
 
         // default Makefile

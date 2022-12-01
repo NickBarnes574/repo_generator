@@ -12,7 +12,7 @@
 #include "printer.h"
 #include "user_input.h"
 #include "source_text.h"
-#include "messages.h"
+#include "src_paths.h"
 #include "dest_paths.h"
 
 exit_code_t initialize_repo(options_t *options, char **src_paths, char **dest_paths);

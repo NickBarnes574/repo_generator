@@ -6,6 +6,8 @@ int main(int argc, char **argv)
 
     options_t *options = NULL;
 
+    bool paths_generated = false; // Create a flag to determine whether or not path memory requires freeing
+
     // Initialize signal handler
     signal_setup();
 
@@ -26,6 +28,7 @@ int main(int argc, char **argv)
 
     char **src_paths = generate_src_paths();
     char **dest_paths = generate_dest_paths(options->repo_path);
+    paths_generated = true; // Path memory is now required to be freed
 
     // Initialize the repo
     exit_code = initialize_repo(options, src_paths, dest_paths);
@@ -38,7 +41,12 @@ int main(int argc, char **argv)
 
 END:
     free_options(options);
-    destroy_src_paths(src_paths);
-    destroy_dest_paths(dest_paths);
+
+    // Check if paths memory needs to be freed
+    if (true == paths_generated)
+    {
+        destroy_src_paths(src_paths);
+        destroy_dest_paths(dest_paths);
+    }
     return exit_code;
 }

@@ -25,7 +25,7 @@ char **generate_src_paths()
     const char *home = (const char*)getenv("HOME");
 
     // Allocate space for the path array
-    char **src_paths = calloc(1, sizeof(**src_paths));
+    char **src_paths = calloc(SRC_NUMBER_OF_CODES, sizeof(char**));
     if (NULL == src_paths)
     {
         free (src_paths);
@@ -34,15 +34,15 @@ char **generate_src_paths()
     }
 
     // Allocate space for each path
-    for (size_t idx = 0; idx < SRC_NUMBER_OF_CODES; idx++)
-    {
-        src_paths[idx] = calloc(1, sizeof(char*));
-        if (NULL == src_paths[idx])
-        {
-            destroy_src_paths(src_paths);
-            goto END;
-        }
-    }
+    // for (size_t idx = 0; idx < SRC_NUMBER_OF_CODES; idx++)
+    // {
+    //     src_paths[idx] = calloc(1, sizeof(char*));
+    //     if (NULL == src_paths[idx])
+    //     {
+    //         destroy_src_paths(src_paths);
+    //         goto END;
+    //     }
+    // }
 
     /********************************************************
      * NAME: REPO_GENERATOR

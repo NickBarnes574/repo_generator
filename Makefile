@@ -1,3 +1,5 @@
+CC = gcc
+
 # required options
 CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla
 
@@ -14,7 +16,6 @@ src/file_io.o \
 src/initializer.o \
 src/src_paths.o \
 src/dest_paths.o \
-src/messages.o \
 src/option_handler.o \
 src/signal_handler.o \
 src/source_text.o \
