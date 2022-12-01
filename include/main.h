@@ -10,5 +10,6 @@
 #include "signal_handler.h"
 #include "initializer.h"
 #include "src_paths.h"
+#include "dest_paths.h"
 
 #endif

@@ -392,3 +392,19 @@ const char *generate_main_h()
 
     return main_h;
 }
+
+const char *generate_test_c()
+{
+    const char *test_c =
+"";
+
+    return test_c;
+}
+
+const char *generate_test_all_c()
+{
+    const char *test_all_c =
+"";
+
+    return test_all_c;
+}

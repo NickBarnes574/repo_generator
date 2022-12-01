@@ -50,4 +50,8 @@ const char *generate_main_c();
  */
 const char *generate_main_h();
 
+const char *generate_test_c();
+
+const char *generate_test_all_c();
+
 #endif

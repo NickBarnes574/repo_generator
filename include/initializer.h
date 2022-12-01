@@ -13,10 +13,13 @@
 #include "user_input.h"
 #include "source_text.h"
 #include "messages.h"
+#include "dest_paths.h"
 
-exit_code_t initialize_repo(options_t *options, char **src_paths);
+exit_code_t initialize_repo(options_t *options, char **src_paths, char **dest_paths);
 
-exit_code_t initialize_save_data(options_t *options, char **src_paths);
+exit_code_t initialize_source_data(options_t *options, char **src_paths);
+
+exit_code_t initialize_destination_data(options_t *options, char **dest_paths);
 
 exit_code_t initialize_directory(char *path);
 

@@ -2,7 +2,7 @@
 
 void free_src_paths(char **src_paths)
 {
-    for (size_t idx = 0; idx < NUMBER_OF_CODES; idx++)
+    for (size_t idx = 0; idx < SRC_NUMBER_OF_CODES; idx++)
     {
         free(src_paths[idx]);
         src_paths[idx] = NULL;
@@ -47,84 +47,84 @@ char **generate_src_paths()
     }
 
     /********************************************************
-     * REPO_GENERATOR
-     * user/home/repo_generator
+     * NAME: REPO_GENERATOR
+     * PATH: user/home/repo_generator
     *********************************************************/
-    src_paths[DIR_REPO] = append_path(home, "repo_generator");
-    const char *repo = src_paths[DIR_REPO];
+    src_paths[SRC_DIR_REPO] = append_path(home, "repo_generator");
+    const char *repo = src_paths[SRC_DIR_REPO];
 
     /********************************************************
-     * SAVE_DATA
-     * user/home/repo_generator/save_data
+     * NAME: SAVE_DATA
+     * PATH: user/home/repo_generator/save_data
     *********************************************************/
-    src_paths[DIR_SAVE_DATA] = append_path(repo, "save_data");
-    const char *save_data = src_paths[DIR_SAVE_DATA];
+    src_paths[SRC_DIR_SAVE_DATA] = append_path(repo, "save_data");
+    const char *save_data = src_paths[SRC_DIR_SAVE_DATA];
 
     /********************************************************
-     * C
-     * user/home/repo_generator/save_data/C
+     * NAME: C
+     * PATH: user/home/repo_generator/save_data/C
     *********************************************************/
-    src_paths[DIR_C] = append_path(save_data, "C");
-    const char *c = src_paths[DIR_C];
+    src_paths[SRC_DIR_C] = append_path(save_data, "C");
+    const char *c = src_paths[SRC_DIR_C];
 
         // default Makefile
-        src_paths[FILE_DEF_MAKEFILE] = append_path(c, "Makefile");
+        src_paths[SRC_FILE_DEF_MAKEFILE] = append_path(c, "Makefile");
 
         // .gitignore
-        src_paths[FILE_GITIGNORE] = append_path(c, ".gitignore");
+        src_paths[SRC_FILE_GITIGNORE] = append_path(c, ".gitignore");
 
     /********************************************************
-     * SRC
-     * user/home/repo_generator/save_data/C/src
+     * NAME: SRC
+     * PATH: user/home/repo_generator/save_data/C/src
     *********************************************************/
-    src_paths[DIR_SRC] = append_path(c, "src");
-    const char *src = src_paths[DIR_SRC];
+    src_paths[SRC_DIR_SRC] = append_path(c, "src");
+    const char *src = src_paths[SRC_DIR_SRC];
 
         // main.c
-        src_paths[FILE_MAIN_C] = append_path(src, "main.c");
+        src_paths[SRC_FILE_MAIN_C] = append_path(src, "main.c");
 
         // exit_codes.c
-        src_paths[FILE_EXIT_CODES_C] = append_path(src, "exit_codes.c");
+        src_paths[SRC_FILE_EXIT_CODES_C] = append_path(src, "exit_codes.c");
 
     /********************************************************
-     * INCLUDE
-     * user/home/repo_generator/save_data/C/include
+     * NAME: INCLUDE
+     * PATH: user/home/repo_generator/save_data/C/include
     *********************************************************/
-    src_paths[DIR_INCLUDE] = append_path(c, "include");
-    const char *include = src_paths[DIR_INCLUDE];
+    src_paths[SRC_DIR_INCLUDE] = append_path(c, "include");
+    const char *include = src_paths[SRC_DIR_INCLUDE];
 
         // main.h
-        src_paths[FILE_MAIN_H] = append_path(include, "main.h");
+        src_paths[SRC_FILE_MAIN_H] = append_path(include, "main.h");
 
         // exit_codes.h
-        src_paths[FILE_EXIT_CODES_H] = append_path(include, "exit_codes.h");
+        src_paths[SRC_FILE_EXIT_CODES_H] = append_path(include, "exit_codes.h");
 
     /********************************************************
-     * DOCS
-     * user/home/repo_generator/save_data/C/docs
+     * NAME: DOCS
+     * PATH: user/home/repo_generator/save_data/C/docs
     *********************************************************/
-    src_paths[DIR_DOCS] = append_path(c, "docs");
-    const char *docs = src_paths[DIR_DOCS];
+    src_paths[SRC_DIR_DOCS] = append_path(c, "docs");
+    const char *docs = src_paths[SRC_DIR_DOCS];
 
     /********************************************************
-     * TESTS
-     * user/home/repo_generator/save_data/C/test
+     * NAME: TESTS
+     * PATH: user/home/repo_generator/save_data/C/test
     *********************************************************/
-    src_paths[DIR_TEST] = append_path(c, "test");
-    const char *test = src_paths[DIR_TEST];
+    src_paths[SRC_DIR_TEST] = append_path(c, "test");
+    const char *test = src_paths[SRC_DIR_TEST];
 
         // tests.c
-        src_paths[FILE_TESTS] = append_path(test, "tests.c");
+        src_paths[SRC_FILE_TESTS] = append_path(test, "tests.c");
 
         // test_all.c
-        src_paths[FILE_TEST_ALL] = append_path(test, "test_all.c");
+        src_paths[SRC_FILE_TEST_ALL] = append_path(test, "test_all.c");
 
     /********************************************************
-     * TEMPLATES
-     * user/home/repo_generator/save_data/C/templates
+     * NAME: TEMPLATES
+     * NAME: user/home/repo_generator/save_data/C/templates
     *********************************************************/
-    src_paths[DIR_TEMPLATES] = append_path(c, "templates");
-    const char *templates = src_paths[DIR_TEMPLATES];
+    src_paths[SRC_DIR_TEMPLATES] = append_path(c, "templates");
+    const char *templates = src_paths[SRC_DIR_TEMPLATES];
 
 END:
     return src_paths;

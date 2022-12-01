@@ -9,59 +9,59 @@
 // ENUM for source paths
 typedef enum src_codes
 {
-    DIR_REPO,
-        DIR_SAVE_DATA,
+    SRC_DIR_REPO,
+        SRC_DIR_SAVE_DATA,
 
         /******************
          C directory
          ******************/
-        DIR_C,
-            FILE_DEF_MAKEFILE, // default Makefile
-            FILE_GITIGNORE, // .gitignore
+        SRC_DIR_C,
+            /*1. */ SRC_FILE_DEF_MAKEFILE, // default Makefile
+            /*2. */ SRC_FILE_GITIGNORE, // .gitignore
 
             /******************
              src directory
              ******************/
-            DIR_SRC,
-                FILE_MAIN_C,
-                FILE_EXIT_CODES_C,
+            SRC_DIR_SRC,
+                /*1. */ SRC_FILE_MAIN_C,
+                /*2. */ SRC_FILE_EXIT_CODES_C,
             
             /******************
              include directory
              ******************/
-            DIR_INCLUDE,
-                FILE_MAIN_H,
-                FILE_EXIT_CODES_H,
+            SRC_DIR_INCLUDE,
+                /*1. */ SRC_FILE_MAIN_H,
+                /*2. */ SRC_FILE_EXIT_CODES_H,
             
             /******************
              docs directory
              ******************/
-            DIR_DOCS,
+            SRC_DIR_DOCS,
 
             /******************
              test directory
              ******************/
-            DIR_TEST,
-                FILE_TESTS,
-                FILE_TEST_ALL,
+            SRC_DIR_TEST,
+                /*1. */ SRC_FILE_TESTS,
+                /*2. */ SRC_FILE_TEST_ALL,
             
             /******************
              template directory
              ******************/
-            DIR_TEMPLATES,
+            SRC_DIR_TEMPLATES,
 
                 // makefile templates
-                DIR_MAKEFILES,
-                    FILE_MAKEFILE_SINGLE,
-                    FILE_MAKEFILE_MULTI,
-                    FILE_MAKEFILE_LIBRARY,
+                SRC_DIR_MAKEFILES,
+                    /*1. */ SRC_FILE_MAKEFILE_SINGLE,
+                    /*2. */ SRC_FILE_MAKEFILE_MULTI,
+                    /*3. */ SRC_FILE_MAKEFILE_LIBRARY,
 
                 // signal handler templates
-                DIR_SIGNAL_HANDLER,
-                    FILE_SIGNAL_HANDLER_C,
-                    FILE_SIGNAL_HANDLER_H,
+                SRC_DIR_SIGNAL_HANDLER,
+                    /*1. */ SRC_FILE_SIGNAL_HANDLER_C,
+                    /*2. */ SRC_FILE_SIGNAL_HANDLER_H,
 
-    NUMBER_OF_CODES,
+    SRC_NUMBER_OF_CODES,
     
 } src_codes_t;
 

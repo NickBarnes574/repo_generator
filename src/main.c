@@ -25,9 +25,10 @@ int main(int argc, char **argv)
     }
 
     char **src_paths = generate_src_paths();
+    char **dest_paths = generate_dest_paths(options->repo_path);
 
     // Initialize the repo
-    exit_code = initialize_repo(options, src_paths);
+    exit_code = initialize_repo(options, src_paths, destroy_src_paths);
     if (E_SUCCESS != exit_code)
     {
         goto END;
@@ -38,5 +39,6 @@ int main(int argc, char **argv)
 END:
     free_options(options);
     destroy_src_paths(src_paths);
+    destroy_dest_paths(dest_paths);
     return exit_code;
 }
