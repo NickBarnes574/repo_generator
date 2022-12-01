@@ -24,10 +24,8 @@ char **generate_src_paths()
     // Get the user's home directory
     const char *home = (const char*)getenv("HOME");
 
-    src_codes_t src_codes;
-
     // Allocate space for the path array
-    char **src_paths = calloc(1, sizeof(char**));
+    char **src_paths = calloc(1, sizeof(**src_paths));
     if (NULL == src_paths)
     {
         free (src_paths);
@@ -36,7 +34,7 @@ char **generate_src_paths()
     }
 
     // Allocate space for each path
-    for (size_t idx = 0; idx < src_codes; idx++)
+    for (size_t idx = 0; idx < SRC_NUMBER_OF_CODES; idx++)
     {
         src_paths[idx] = calloc(1, sizeof(char*));
         if (NULL == src_paths[idx])
@@ -104,7 +102,6 @@ char **generate_src_paths()
      * PATH: user/home/repo_generator/save_data/C/docs
     *********************************************************/
     src_paths[SRC_DIR_DOCS] = append_path(c, "docs");
-    const char *docs = src_paths[SRC_DIR_DOCS];
 
     /********************************************************
      * NAME: TESTS
@@ -124,7 +121,6 @@ char **generate_src_paths()
      * NAME: user/home/repo_generator/save_data/C/templates
     *********************************************************/
     src_paths[SRC_DIR_TEMPLATES] = append_path(c, "templates");
-    const char *templates = src_paths[SRC_DIR_TEMPLATES];
 
 END:
     return src_paths;

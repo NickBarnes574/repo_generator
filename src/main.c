@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     char **dest_paths = generate_dest_paths(options->repo_path);
 
     // Initialize the repo
-    exit_code = initialize_repo(options, src_paths, destroy_src_paths);
+    exit_code = initialize_repo(options, src_paths, dest_paths);
     if (E_SUCCESS != exit_code)
     {
         goto END;

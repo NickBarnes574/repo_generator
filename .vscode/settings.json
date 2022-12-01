@@ -3,6 +3,7 @@
         "user_input.h": "c",
         "printer.h": "c",
         "stdlib.h": "c",
-        "initializer.h": "c"
+        "initializer.h": "c",
+        "src_paths.h": "c"
     }
 }

@@ -22,10 +22,8 @@ void destroy_dest_paths(char **dest_paths)
 char **generate_dest_paths(const char *path)
 {    
     // Get the project path from the user
-    const char *project_path = "";
-    strcpy(project_path, (const)path);
-
-    dest_codes_t dest_codes;
+    char project_path[512] = "";
+    strcpy(project_path, path);
 
     // Allocate space for the path array
     char **dest_paths = calloc(1, sizeof(char**));
@@ -37,7 +35,7 @@ char **generate_dest_paths(const char *path)
     }
 
     // Allocate space for each path
-    for (size_t idx = 0; idx < dest_codes; idx++)
+    for (size_t idx = 0; idx < DEST_NUMBER_OF_CODES; idx++)
     {
         dest_paths[idx] = calloc(1, sizeof(char*));
         if (NULL == dest_paths[idx])
@@ -91,7 +89,6 @@ char **generate_dest_paths(const char *path)
      * PATH: user/home/repo_generator/save_data/C/docs
     *********************************************************/
     dest_paths[DEST_DIR_DOCS] = append_path(repo, "docs");
-    const char *docs = dest_paths[DEST_DIR_DOCS];
 
     /********************************************************
      * NAME: TESTS
@@ -111,7 +108,6 @@ char **generate_dest_paths(const char *path)
      * NAME: user/home/repo_generator/save_data/C/templates
     *********************************************************/
     dest_paths[DEST_DIR_TEMPLATES] = append_path(repo, "templates");
-    const char *templates = dest_paths[DEST_DIR_TEMPLATES];
 
 END:
     return dest_paths;

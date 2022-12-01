@@ -1,6 +1,6 @@
 #include "user_input.h"
 
-exit_code_t get_input_yes_no(FILE *file_ptr, char *message)
+exit_code_t get_input_yes_no(FILE *file_ptr, const char *message)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 

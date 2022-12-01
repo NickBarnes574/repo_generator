@@ -10,6 +10,6 @@
 #include "signal_handler.h"
 #include "file_io.h"
 
-exit_code_t get_input_yes_no(FILE *file_ptr, char *message);
+exit_code_t get_input_yes_no(FILE *file_ptr, const char *message);
 
 #endif
