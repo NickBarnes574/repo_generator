@@ -30,17 +30,6 @@ char **generate_dest_paths(const char *path)
         goto END;
     }
 
-    // Allocate space for each path
-    // for (size_t idx = 0; idx < DEST_NUMBER_OF_CODES; idx++)
-    // {
-    //     dest_paths[idx] = calloc(1, sizeof(char*));
-    //     if (NULL == dest_paths[idx])
-    //     {
-    //         destroy_dest_paths(dest_paths);
-    //         goto END;
-    //     }
-    // }
-
     /********************************************************
      * NAME: REPO_GENERATOR
      * PATH: user/home/repo_generator

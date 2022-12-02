@@ -33,17 +33,6 @@ char **generate_src_paths()
         goto END;
     }
 
-    // Allocate space for each path
-    // for (size_t idx = 0; idx < SRC_NUMBER_OF_CODES; idx++)
-    // {
-    //     src_paths[idx] = calloc(1, sizeof(char*));
-    //     if (NULL == src_paths[idx])
-    //     {
-    //         destroy_src_paths(src_paths);
-    //         goto END;
-    //     }
-    // }
-
     /********************************************************
      * NAME: REPO_GENERATOR
      * PATH: user/home/repo_generator

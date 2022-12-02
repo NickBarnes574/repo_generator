@@ -395,16 +395,87 @@ const char *generate_main_h()
 
 const char *generate_test_c()
 {
-    const char *test_c =
-"";
+    const char *tests_c =
+"\n\
+#include <check.h>\n\
+#include <stdio.h>\n\
+#include <stdlib.h>\n\
+\n\
+// // TEST CASE\n\
+// //***********************************************************************************************\n\
+// // XXXX TESTS\n\
+// START_TEST(test_YYYY)\n\
+// {\n\
+\n\
+// }\n\
+// END_TEST\n\
+\n\
+// // TEST LIST\n\
+// static TFun XXXX_tests[] =\n\
+// {\n\
+//     test_YYYY,\n\
+//     NULL\n\
+// };\n\
+\n\
+static void add_tests(TCase * test_cases, TFun * test_functions)\n\
+{\n\
+    while (* test_functions)\n\
+    {\n\
+        // add the test from the core_tests array to the tcase\n\
+        tcase_add_test(test_cases, * test_functions);\n\
+        test_functions++;\n\
+    }\n\
+}\n\
+\n\
+Suite *project_test_suite(void)\n\
+{\n\
+    Suite *project_test_suite = suite_create(\"Project Tests\");\n\
+\n\
+    // CREATE TESTS\n\
+\n\
+    // //Create XXXX tests\n\
+    // TFun *XXXX_test_list = XXXX_tests;\n\
+    // TCase *XXXX_test_cases = tcase_create(\" XXXX() Tests\");\n\
+    // add_tests(XXXX_test_cases, XXXX_test_list);\n\
+    // suite_add_tcase(project_test_suite, XXXX_test_cases);\n\
+\n\
+    return trie_test_suite;\n\
+}\n\
+";
 
-    return test_c;
+    return tests_c;
 }
 
 const char *generate_test_all_c()
 {
     const char *test_all_c =
-"";
+"\n\
+#include <check.h>\n\
+\n\
+extern Suite *project_test_suite(void);\n\
+\n\
+int main(int argc, char** argv)\n\
+{\n\
+  // Suppress unused parameter warnings\n\
+  (void) argv[argc];\n\
+\n\
+  // create test suite runner\n\
+  SRunner *sr = srunner_create(NULL);\n\
+\n\
+  // prepare the test suites\n\
+  srunner_add_suite(sr, project_test_suite());\n\
+\n\
+  // run the test suites\n\
+  srunner_run_all(sr, CK_VERBOSE);\n\
+\n\
+  // report the test failed status\n\
+  int tests_failed = srunner_ntests_failed(sr);\n\
+  srunner_free(sr);\n\
+\n\
+  // return 1 or 0 based on whether or not tests failed\n\
+  return (tests_failed == 0) ? 0 : 1;\n\
+}\n\
+";
 
     return test_all_c;
 }
