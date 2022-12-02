@@ -13,7 +13,7 @@ exit_code_t initialize_repo(options_t *options, char **src_paths, char **dest_pa
     // Create an initialization message
     char msg_init_repo[1024] = "";
     strcpy(msg_init_repo, "\n----------------NOTICE----------------\n");
-    strcat(msg_init_repo, "This will initialize the following path as a C repository:\n\nREPOSITORY: [");
+    strcat(msg_init_repo, "This will generate C project files in the following directory:\n\nPROJECT FOLDER: [");
     strcat(msg_init_repo, dest_paths[DEST_DIR_REPO]);
     strcat(msg_init_repo, "]\n\nDo you wish to continue? [Y]/[N] ");
 
@@ -75,7 +75,7 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths)
         }
 
         // Print initialization message
-        fprintf(stdout, "%s", "\n------INITIALIZING SAVE DIRECTORY------\n");
+        fprintf(stdout, "%s", "\nInitializing save directory...\n");
 
         // Create the repo_generator directory if it doesn't exist
         exit_code = create_directory(src_paths[SRC_DIR_REPO]);
@@ -84,7 +84,7 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths)
             print_exit_message(exit_code);
             goto END;
         }
-        print_leader_line(stdout, "DIRECTORY", src_paths[SRC_DIR_REPO], "OK");
+        //print_leader_line(stdout, "DIRECTORY", src_paths[SRC_DIR_REPO], "OK");
 
         // Create the save_data directory if it doesn't exist
         exit_code = create_directory(src_paths[SRC_DIR_SAVE_DATA]);
@@ -93,7 +93,7 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths)
             print_exit_message(exit_code);
             goto END;
         }
-        print_leader_line(stdout, "DIRECTORY", src_paths[SRC_DIR_SAVE_DATA], "OK");
+        //print_leader_line(stdout, "DIRECTORY", src_paths[SRC_DIR_SAVE_DATA], "OK");
     }
     else
     {
@@ -148,7 +148,7 @@ END:
     return exit_code;
 }
 
-exit_code_t initialize_directory(char *path)
+exit_code_t initialize_directory(char *path, bool disp_result)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
@@ -176,11 +176,14 @@ exit_code_t initialize_directory(char *path)
     strcpy(result, "OK");
     exit_code = E_SUCCESS;
 END:
-    print_leader_line(stdout, "DIRECTORY", path, result);
+    if (true == disp_result)
+    {
+        print_leader_line(stdout, "DIRECTORY", path, result);
+    }
     return exit_code;
 }
 
-exit_code_t initialize_file(char *path, const char *contents)
+exit_code_t initialize_file(char *path, const char *contents, bool disp_result)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
@@ -215,7 +218,10 @@ exit_code_t initialize_file(char *path, const char *contents)
     strcpy(result, "OK");
     exit_code = E_SUCCESS;
 END:
-    print_leader_line(stdout, "FILE", path, result);
+    if (true == disp_result)
+    {
+        print_leader_line(stdout, "FILE", path, result);
+    }
     return exit_code;
 }
 
@@ -229,45 +235,45 @@ exit_code_t init_c_src_directories(char **src_paths)
         goto END;
     }
 
-    printf("\n------INITIALIZING SOURCE DIRECTORIES------\n");
+    printf("Initializing source directories...\n");
 
     // Initialize 'C' directory
-    exit_code = initialize_directory(src_paths[SRC_DIR_C]);
+    exit_code = initialize_directory(src_paths[SRC_DIR_C], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'src' directory
-    exit_code = initialize_directory(src_paths[SRC_DIR_SRC]);
+    exit_code = initialize_directory(src_paths[SRC_DIR_SRC], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'include' directory
-    exit_code = initialize_directory(src_paths[SRC_DIR_INCLUDE]);
+    exit_code = initialize_directory(src_paths[SRC_DIR_INCLUDE], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'docs' directory
-    exit_code = initialize_directory(src_paths[SRC_DIR_DOCS]);
+    exit_code = initialize_directory(src_paths[SRC_DIR_DOCS], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'test' directory
-    exit_code = initialize_directory(src_paths[SRC_DIR_TEST]);
+    exit_code = initialize_directory(src_paths[SRC_DIR_TEST], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'templates' directory
-    exit_code = initialize_directory(src_paths[SRC_DIR_TEMPLATES]);
+    exit_code = initialize_directory(src_paths[SRC_DIR_TEMPLATES], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
@@ -288,7 +294,7 @@ exit_code_t init_c_src_files(char **src_paths)
         goto END;
     }
 
-    printf("\n---------INITIALIZING SOURCE FILES--------\n");
+    printf("Initializing source files...\n");
 
     const char *main_c = generate_main_c();
     const char *main_h = generate_main_h();
@@ -300,56 +306,56 @@ exit_code_t init_c_src_files(char **src_paths)
     const char *gitignore = generate_gitignore();
 
     // Initialize 'main.c'
-    exit_code = initialize_file(src_paths[SRC_FILE_MAIN_C], main_c);
+    exit_code = initialize_file(src_paths[SRC_FILE_MAIN_C], main_c, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'main.h'
-    exit_code = initialize_file(src_paths[SRC_FILE_MAIN_H], main_h);
+    exit_code = initialize_file(src_paths[SRC_FILE_MAIN_H], main_h, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'exit_c'
-    exit_code = initialize_file(src_paths[SRC_FILE_EXIT_CODES_C], exit_c);
+    exit_code = initialize_file(src_paths[SRC_FILE_EXIT_CODES_C], exit_c, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'exit_h'
-    exit_code = initialize_file(src_paths[SRC_FILE_EXIT_CODES_H], exit_h);
+    exit_code = initialize_file(src_paths[SRC_FILE_EXIT_CODES_H], exit_h, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'tests.c'
-    exit_code = initialize_file(src_paths[SRC_FILE_TESTS], test_c);
+    exit_code = initialize_file(src_paths[SRC_FILE_TESTS], test_c, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'test_all.c'
-    exit_code = initialize_file(src_paths[SRC_FILE_TEST_ALL], test_all_c);
+    exit_code = initialize_file(src_paths[SRC_FILE_TEST_ALL], test_all_c, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize default 'Makefile'
-    exit_code = initialize_file(src_paths[SRC_FILE_DEF_MAKEFILE], def_makefile);
+    exit_code = initialize_file(src_paths[SRC_FILE_DEF_MAKEFILE], def_makefile, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize '.gitignore'
-    exit_code = initialize_file(src_paths[SRC_FILE_GITIGNORE], gitignore);
+    exit_code = initialize_file(src_paths[SRC_FILE_GITIGNORE], gitignore, false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
@@ -370,45 +376,45 @@ exit_code_t init_c_dest_directories(char **dest_paths)
         goto END;
     }
 
-    printf("\n----CREATING DESTINATION DIRECTORIES----\n");
+    printf("Initializing destination directories...\n");
 
     // Initialize 'repo' directory
-    exit_code = initialize_directory(dest_paths[DEST_DIR_REPO]);
+    exit_code = initialize_directory(dest_paths[DEST_DIR_REPO], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'src' directory
-    exit_code = initialize_directory(dest_paths[DEST_DIR_SRC]);
+    exit_code = initialize_directory(dest_paths[DEST_DIR_SRC], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'include' directory
-    exit_code = initialize_directory(dest_paths[DEST_DIR_INCLUDE]);
+    exit_code = initialize_directory(dest_paths[DEST_DIR_INCLUDE], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'docs' directory
-    exit_code = initialize_directory(dest_paths[DEST_DIR_DOCS]);
+    exit_code = initialize_directory(dest_paths[DEST_DIR_DOCS], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'test' directory
-    exit_code = initialize_directory(dest_paths[DEST_DIR_TEST]);
+    exit_code = initialize_directory(dest_paths[DEST_DIR_TEST], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'templates' directory
-    exit_code = initialize_directory(dest_paths[DEST_DIR_TEMPLATES]);
+    exit_code = initialize_directory(dest_paths[DEST_DIR_TEMPLATES], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
@@ -429,7 +435,7 @@ exit_code_t init_c_dest_files(char **dest_paths)
         goto END;
     }
 
-    printf("\n---------INITIALIZING DESTINATION FILES--------\n");
+    printf("\n---------GENERATING PROJECT FILES--------\n");
 
     const char *main_c = generate_main_c();
     const char *main_h = generate_main_h();
@@ -441,56 +447,56 @@ exit_code_t init_c_dest_files(char **dest_paths)
     const char *gitignore = generate_gitignore();
 
     // Initialize 'main.c'
-    exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_C], main_c);
+    exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_C], main_c, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'main.h'
-    exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_H], main_h);
+    exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_H], main_h, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'exit_c'
-    exit_code = initialize_file(dest_paths[DEST_FILE_EXIT_CODES_C], exit_c);
+    exit_code = initialize_file(dest_paths[DEST_FILE_EXIT_CODES_C], exit_c, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'exit_h'
-    exit_code = initialize_file(dest_paths[DEST_FILE_EXIT_CODES_H], exit_h);
+    exit_code = initialize_file(dest_paths[DEST_FILE_EXIT_CODES_H], exit_h, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'tests.c'
-    exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c);
+    exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize 'test_all.c'
-    exit_code = initialize_file(dest_paths[DEST_FILE_TEST_ALL], test_all_c);
+    exit_code = initialize_file(dest_paths[DEST_FILE_TEST_ALL], test_all_c, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize default 'Makefile'
-    exit_code = initialize_file(dest_paths[DEST_FILE_DEF_MAKEFILE], def_makefile);
+    exit_code = initialize_file(dest_paths[DEST_FILE_DEF_MAKEFILE], def_makefile, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
 
     // Initialize '.gitignore'
-    exit_code = initialize_file(dest_paths[DEST_FILE_GITIGNORE], gitignore);
+    exit_code = initialize_file(dest_paths[DEST_FILE_GITIGNORE], gitignore, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;

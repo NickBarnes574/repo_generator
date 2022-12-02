@@ -21,11 +21,11 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths);
 
 exit_code_t initialize_destination_data(options_t *options, char **dest_paths);
 
-exit_code_t initialize_directory(char *path);
+exit_code_t initialize_directory(char *path, bool disp_result);
 
 exit_code_t init_c_src_directories(char **src_paths);
 
-exit_code_t initialize_file(char *path, const char *contents);
+exit_code_t initialize_file(char *path, const char *contents, bool disp_result);
 
 exit_code_t init_c_src_files(char **src_paths);
 
