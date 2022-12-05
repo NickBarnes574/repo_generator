@@ -1,0 +1,34 @@
+SUMMARY
+    pj - Project file generator for C and Python
+
+DESCRIPTION
+    pj is a tool which automatically generates default project
+    directories and files for C or Python projects at a
+    user-specified project path.
+
+    -Files generated for C projects loosely follow the BARR-C standard
+    -Files generated for Python projects are PEP8 compliant.
+
+    For more information on files and file structure see the pj(1)
+    manpage ("man pj").
+
+USAGE
+    pj [options] <project_path>
+
+OPTIONS
+    -c	 generate a C project file structure
+    -p   generate a Python project file structure
+    -l   specify a save location for source data
+    -n   specify a program name(s) for your project
+    -t   generate a template directory
+    -a   generate advanced file structure (getopt, signal handler)
+
+    For a full listing of options and detailed descriptions, use pj --help.
+
+EXAMPLES
+    Example 1 (C):
+        $ ./pj -cn /home/user/project/ my_program
+
+    Example 2 (Python):
+        $ ./pj -p /home/user/project/
+
