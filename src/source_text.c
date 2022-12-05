@@ -2,7 +2,7 @@
 
 const char *generate_gitignore()
 {
-    const char * gitignore =
+    static const char * gitignore =
 "\n\
 # Prerequisites\n\
 *.d\n\
@@ -66,7 +66,7 @@ templates/\n\
 
 const char *generate_makefile_single_program()
 {
-    const char *Makefile =
+    static const char *Makefile =
 
 "# required options\n\
 CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
@@ -141,7 +141,7 @@ test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
 
 const char *generate_makefile_multi_program()
 {
-    const char *Makefile =
+    static const char *Makefile =
 
 "# required options\n\
 CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
@@ -216,7 +216,7 @@ test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
 
 const char *generate_exit_codes_c()
 {
-    const char *exit_codes_c =
+    static const char *exit_codes_c =
 "\n\
 #include \"exit_codes.h\"\n\
 \n\
@@ -292,7 +292,7 @@ void print_exit_message(exit_code_t exit_code)\n\
 
 const char *generate_exit_codes_h()
 {
-    const char *exit_codes_h =
+    static const char *exit_codes_h =
 "\n\
 #ifndef EXIT_CODES_H\n\
 #define EXIT_CODES_H\n\
@@ -359,7 +359,7 @@ void print_exit_message(exit_code_t exit_code);\n\
 
 const char *generate_main_c()
 {
-    const char *main_c =
+    static const char *main_c =
 "\n\
 #include \"main.h\"\n\
 \n\
@@ -377,7 +377,7 @@ END:\n\
 
 const char *generate_main_h()
 {
-    const char *main_h =
+    static const char *main_h =
 "\n\
 #ifndef MAIN_H\n\
 #define MAIN_H\n\
@@ -395,7 +395,7 @@ const char *generate_main_h()
 
 const char *generate_test_c()
 {
-    const char *tests_c =
+    static const char *tests_c =
 "\n\
 #include <check.h>\n\
 #include <stdio.h>\n\
