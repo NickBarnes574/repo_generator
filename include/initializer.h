@@ -15,7 +15,12 @@
 #include "src_paths.h"
 #include "dest_paths.h"
 
+#define C "C"
+#define PYTHON "Python"
+
 exit_code_t initialize_repo(options_t *options, char **src_paths, char **dest_paths);
+
+exit_code_t initialize_save_directory(options_t *options, char **src_paths);
 
 exit_code_t initialize_source_data(options_t *options, char **src_paths);
 

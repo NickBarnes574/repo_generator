@@ -5,11 +5,33 @@ void usage(char *program_name, int option)
     if (NULL == program_name)
     {
         fprintf(stderr, "NULL Pointer detected\n");
+        goto END;
     }
     if (1 == option)
     {
-        printf(USAGE_FMT_DEFAULT, program_name);
+        printf("\n\033[1mSUMMARY\033[m\n");
+        printf("    %s - Project file generator for C and Python\n", program_name);
+        printf("\n\033[1mDESCRIPTION\033[m\n");
+        printf("    %s is a tool which automatically generates default project\n", program_name);
+        printf("    directories and files for C and Python projects.\n");
+        printf("\n    -Files generated for C projects loosely follow the BARR-C standard\n");
+        printf("    -Files generated for Python projects are PEP8 compliant.\n");
+        printf("\n    For more information on files and file structure see the %s(1)\n", program_name);
+        printf("    manpage (\"man %s\").\n", program_name);
+        printf("\n\033[1mUSAGE\033[m\n");
+        printf("    %s [options] <project_path>\n", program_name);
+        printf("\n\033[1mOPTIONS\033[m\n");
+        printf("    \033[1m-c\033[m     generate a C project file structure\n");
+        printf("    \033[1m-p\033[m     generate a Python project file structure\n");
+        printf("\n    For a full listing of options, use %s --help.\n", program_name);
+        printf("\n\033[1mEXAMPLES\033[m\n");
+        printf("    Example 1 (C):\n");
+        printf("        $ ./%s -c /home/user/project/\n", program_name);
+        printf("\n    Example 2 (Python):\n");
+        printf("        $ ./%s -p /home/user/project/\n", program_name);
     }
+END:
+    return;
 }
 
 exit_code_t free_options(options_t *options)
@@ -39,9 +61,9 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
     }
 
     int option = 0;                 // Option used for getopt
-    char program_name[] = "initialize";
+    char program_name[] = "pj";
 
-    while ((option = getopt(argc, argv, "c:")) != -1)
+    while ((option = getopt(argc, argv, "cp:")) != -1)
     {
         switch (option)
         {
@@ -58,10 +80,24 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
 
                 options->c_flag = true;      
                 break;
+            
+            case 'p':
+
+            // Check if the p_flag was previously turned on
+            if (true == options->p_flag)
+            {
+                usage(program_name, 1);
+                exit_code = E_INVALID_INPUT;
+                print_exit_message(exit_code);
+                goto END;
+            }
+
+                options->p_flag = true;      
+                break;
 
             case '?':
             default:
-                fprintf(stderr, "Option '-%c' not supported\n", optopt);
+                fprintf(stderr, "\nOption '-%c' not supported\n", optopt);
                 usage(program_name, 1);
                 exit_code = E_INVALID_INPUT;
                 goto END;

@@ -10,11 +10,12 @@
 #include "exit_codes.h"
 #include "file_io.h"
 
-#define USAGE_FMT_DEFAULT "%s [-c repo_path]\n"
+#define USAGE_FMT_DEFAULT "usage: %s [-h] [--help] [-c <path>] [-p <path]\n"
 
 typedef struct 
 {
     bool c_flag;    // Used to set the truth value for the C flag
+    bool p_flag;    // Used to set the truth value for the P flag
     char *repo_path;
 } options_t;
 

@@ -12,14 +12,34 @@ exit_code_t initialize_repo(options_t *options, char **src_paths, char **dest_pa
 
     // Create an initialization message
     char msg_init_repo[1024] = "";
-    strcpy(msg_init_repo, "\n----------------NOTICE----------------\n");
-    strcat(msg_init_repo, "This will generate C project files in the following directory:\n\nPROJECT FOLDER: [");
+    strcpy(msg_init_repo, "\nProject Type: ");
+
+    // Create a C project
+    if (true == options->c_flag)
+    {
+        strcat(msg_init_repo, C);
+    }
+
+    // Create a Python project
+    if (true == options->p_flag)
+    {
+        strcat(msg_init_repo, PYTHON);
+    }
+
+    strcat(msg_init_repo, "\nProject files will be generated in the following directory:\n\nPROJECT FOLDER: [");
     strcat(msg_init_repo, dest_paths[DEST_DIR_REPO]);
     strcat(msg_init_repo, "]\n\nDo you wish to continue? [Y]/[N] ");
 
     // Check if the user wants to initialize the input path as a C repository
     exit_code = get_input_yes_no(stdin, msg_init_repo);
     if (E_YES != exit_code)
+    {
+        goto END;
+    }
+
+    // Initialize save directory
+    exit_code = initialize_save_directory(options, src_paths);
+    if (E_SUCCESS != exit_code)
     {
         goto END;
     }
@@ -43,7 +63,7 @@ END:
     return exit_code;
 }
 
-exit_code_t initialize_source_data(options_t *options, char **src_paths)
+exit_code_t initialize_save_directory(options_t *options, char **src_paths)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
@@ -53,8 +73,6 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths)
         goto END;
     }
 
-    // Check if the save_data directory exists
-    fprintf(stdout, "%s", "\n--------CHECKING SAVE DIRECTORY--------\n");
     exit_code = directory_exists(src_paths[SRC_DIR_REPO]);
 
     // Create a save directory message
@@ -100,6 +118,21 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths)
         fprintf(stdout, "%s", "\n[SAVE DIRECTORY FOUND]\n");
     }
 
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+exit_code_t initialize_source_data(options_t *options, char **src_paths)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if ((NULL == options) || (NULL == src_paths))
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
     // Check if the 'C' subdirectory exists within the save_data directory
     if (true == options->c_flag)
     {
@@ -131,16 +164,19 @@ exit_code_t initialize_destination_data(options_t *options, char **dest_paths)
         goto END;
     }
 
-    exit_code = init_c_dest_directories(dest_paths);
-    if (E_SUCCESS != exit_code)
+    if (true == options->c_flag)
     {
-        goto END;
-    }
+        exit_code = init_c_dest_directories(dest_paths);
+        if (E_SUCCESS != exit_code)
+        {
+            goto END;
+        }
 
-    exit_code = init_c_dest_files(dest_paths);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
+        exit_code = init_c_dest_files(dest_paths);
+        if (E_SUCCESS != exit_code)
+        {
+            goto END;
+        }
     }
 
     exit_code = E_SUCCESS;
