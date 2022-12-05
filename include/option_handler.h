@@ -16,16 +16,17 @@ typedef struct
 {
     bool c_flag;    // Used to set the truth value for the C flag
     bool p_flag;    // Used to set the truth value for the P flag
+    bool n_flag;    // Used to set the truth value for the N flag
     char *repo_path;
+    char **prog_names;
 } options_t;
 
 /**
  * @brief Displays the usage of the program to the user.
  * 
  * @param program_name the name of the program.
- * @param option the option that was passed in.
  */
-void usage(char *program_name, int option);
+void usage(char *program_name);
 
 /**
  * @brief Frees memory for the options_t struct.

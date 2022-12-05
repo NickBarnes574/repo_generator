@@ -42,7 +42,7 @@ pk: $(MAIN_OBJ_FILE) $(OBJ_FILES)
 
 # makes a debug version of the program for use with valgrind
 .PHONY: debug
-debug: CFLAGS += -g -gstabs -O0
+debug: CFLAGS += -g
 debug: $(TARGET)
 
 # makes a profile
