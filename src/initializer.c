@@ -143,7 +143,7 @@ exit_code_t initialize_source_data(options_t *options, char **src_paths)
             goto END;
         }
 
-        exit_code = init_c_src_files(src_paths);
+        exit_code = init_c_src_files(src_paths, options);
         if (E_SUCCESS != exit_code)
         {
             print_exit_message(exit_code);
@@ -172,7 +172,7 @@ exit_code_t initialize_destination_data(options_t *options, char **dest_paths)
             goto END;
         }
 
-        exit_code = init_c_dest_files(dest_paths);
+        exit_code = init_c_dest_files(dest_paths, options);
         if (E_SUCCESS != exit_code)
         {
             goto END;
@@ -320,7 +320,7 @@ END:
     return exit_code;
 }
 
-exit_code_t init_c_src_files(char **src_paths)
+exit_code_t init_c_src_files(char **src_paths, options_t *options)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
@@ -338,7 +338,7 @@ exit_code_t init_c_src_files(char **src_paths)
     const char *exit_h = generate_exit_codes_h();
     const char *test_c = generate_test_c();
     const char *test_all_c = generate_test_all_c();
-    const char *def_makefile = generate_makefile_single_program();
+    char *def_makefile = generate_makefile(options);
     const char *gitignore = generate_gitignore();
 
     // Initialize 'main.c'
@@ -399,6 +399,7 @@ exit_code_t init_c_src_files(char **src_paths)
 
     exit_code = E_SUCCESS;
 END:
+    free(def_makefile);
     return exit_code;
 }
 
@@ -461,7 +462,7 @@ END:
     return exit_code;
 }
 
-exit_code_t init_c_dest_files(char **dest_paths)
+exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
@@ -479,7 +480,7 @@ exit_code_t init_c_dest_files(char **dest_paths)
     const char *exit_h = generate_exit_codes_h();
     const char *test_c = generate_test_c();
     const char *test_all_c = generate_test_all_c();
-    const char *def_makefile = generate_makefile_single_program();
+    char *def_makefile = generate_makefile(options);
     const char *gitignore = generate_gitignore();
 
     // Initialize 'main.c'
@@ -540,5 +541,6 @@ exit_code_t init_c_dest_files(char **dest_paths)
 
     exit_code = E_SUCCESS;
 END:
+    free(def_makefile);
     return exit_code;
 }

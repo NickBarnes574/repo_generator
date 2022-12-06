@@ -32,11 +32,11 @@ exit_code_t init_c_src_directories(char **src_paths);
 
 exit_code_t initialize_file(char *path, const char *contents, bool disp_result);
 
-exit_code_t init_c_src_files(char **src_paths);
+exit_code_t init_c_src_files(char **src_paths, options_t *options);
 
 exit_code_t init_c_dest_directories(char **dest_paths);
 
-exit_code_t init_c_dest_files(char **dest_paths);
+exit_code_t init_c_dest_files(char **dest_paths, options_t *options);
 
 
 

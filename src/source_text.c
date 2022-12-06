@@ -63,80 +63,236 @@ templates/\n\
 
     return gitignore;
 }
-
-const char *generate_makefile_single_program()
+static exit_code_t generate_program_names(char **Makefile, options_t *options, size_t max_len)
 {
-    static const char *Makefile =
+    exit_code_t exit_code = E_DEFAULT_ERROR;
 
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# the name of the output program(s)\n");
+
+    // Generate a default program name 'program'
+    if (num_names == 0)
+    {
+        *Makefile += snprintf(*Makefile, max_len, "TARGET = program\n");
+    }
+
+    // Generate custom program name(s) passed in from the command line
+    else
+    {
+        for (size_t idx = 0; idx < num_names - 1; idx++)
+        {
+            *Makefile += snprintf(*Makefile, max_len, "TARGET_%ld = %s\n", idx+1, prog_names[idx]);
+        }
+    }
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t generate_main_object_files(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# the object file(s) that contains main()\n");
+
+    // Generate a default MAIN_OBJ file
+    if (num_names == 0)
+    {
+        *Makefile += snprintf(*Makefile, max_len, "MAIN_OBJ = src/main.o\n");
+    }
+
+    // Generate custom program name(s) passed in from the command line
+    else
+    {
+        for (size_t idx = 0; idx < num_names - 1; idx++)
+        {
+            *Makefile += snprintf(*Makefile, max_len, "TARGET_%ld_MAIN = src/%s/main.o\n", idx+1, prog_names[idx]);
+        }
+    }
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t default_func(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+char *generate_makefile(options_t *options)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+    size_t max_len = 5000;
+    static char buffer[5000];
+    char *Makefile = buffer;
+
+// Required Options
+Makefile += snprintf(Makefile, max_len,
 "# required options\n\
-CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
-\n\
-# add header files to the compile path\n\
-CFLAGS += -I ./include/\n\
-\n\
-# the object file which contains main\n\
-MAIN_OBJ_FILE = src/main.o\n\
-\n\
-# all of the other object files outside of main\n\
+CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\n");
+
+// Header Files
+Makefile += snprintf(Makefile, max_len,
+"# add header files to the compile path\n\
+CFLAGS += -I ./include/\n\n");
+
+// Generate program name(s)
+exit_code = generate_program_names(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
+
+// Main object files
+exit_code = generate_main_object_files(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
+
+// All other object files
+Makefile += snprintf(Makefile, max_len,
+"# all of the other object files outside of main\n\
 OBJ_FILES = \\\n\
-src/exit_codes.o \n\
-\n\
-# the name of the output program\n\
-TARGET = #PROGRAM_NAME\n\
-\n\
-# individual tests\n\
-TEST_OBJ_FILES = #test/example_tests.o\n\
-\n\
-# combine all the tests into one list\n\
-ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)\n\
-\n\
-# make everything\n\
+src/exit_codes.o \n\n");
+
+// Individual tests
+Makefile += snprintf(Makefile, max_len,
+"# individual tests\n\
+TEST_OBJ_FILES = #test/example_tests.o\n\n");
+
+// Test list
+Makefile += snprintf(Makefile, max_len,
+"# combine all the tests into one list\n\
+ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)\n\n");
+
+// Make all
+Makefile += snprintf(Makefile, max_len,
+"# make everything\n\
 .PHONY: all\n\
-all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)\n\
-\n\
-# makes the program\n\
+all: $(MAIN_OBJ_FILE) $(OBJ_FILES) ");
+
+// Set only 1 target if a program name is not passed in
+if (num_names == 0)
+{
+    Makefile += snprintf(Makefile, max_len,
+    "$(TARGET)\n");
+}
+
+// Set the number of targets that were passed in
+else
+{
+    for (size_t idx = 0; idx < num_names - 1; idx++)
+    {
+        Makefile += snprintf(Makefile, max_len, "$(TARGET_%ld)", idx+1);
+
+        // Add a space between targets unless it's the last target
+        if ((idx + 1) < (num_names - 1))
+        {
+            Makefile += snprintf(Makefile, max_len, " ");
+        }
+    }
+}
+Makefile += snprintf(Makefile, max_len,
+"\n\n");
+
+// Make the target(s)
+Makefile += snprintf(Makefile, max_len,
+"# makes the program\n\
 .PHONY: $(TARGET)\n\
 initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)\n\
-        $(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)\n\
-\n\
-# makes a debug version of the program for use with valgrind\n\
+        $(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)\n\n");
+
+// Make debug
+Makefile += snprintf(Makefile, max_len,
+"# makes a debug version of the program for use with valgrind\n\
 .PHONY: debug\n\
 debug: CFLAGS += -g -gstabs -O0\n\
-debug: $(TARGET)\n\
-\n\
-# makes a profile\n\
+debug: $(TARGET)\n\n");
+
+// Make profile
+Makefile += snprintf(Makefile, max_len,
+"# makes a profile\n\
 .PHONY: profile\n\
 profile: clean\n\
 profile: CFLAGS += -pg\n\
-profile: $(TARGET)\n\
-\n\
-# delete the program and all the .o files\n\
+profile: $(TARGET)\n\n");
+
+// Make clean
+Makefile += snprintf(Makefile, max_len,
+"# delete the program and all the .o files\n\
 .PHONY: clean\n\
 clean:\n\
     $(RM) $(TARGET)\n\
     find . -type f -name \"*.o\" -exec rm -f {} \\;\n\
-    find . -type f -perm /111 -exec rm -f {} \\;\n\
-\n\
-# creates and runs tests using valgrind\n\
+    find . -type f -perm /111 -exec rm -f {} \\;\n\n");
+
+// Create and run tests using valgrind
+Makefile += snprintf(Makefile, max_len,
+"# creates and runs tests using valgrind\n\
 .PHONY: valcheck\n\
 valcheck: CFLAGS += -g\n\
 valcheck: test/initialize_repo_tests\n\
 # disable forking in order to run tests with valgrind\n\
-    CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\
-\n\
-# creates and runs tests\n\
+    CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\n");
+
+// Create and run tests normally
+Makefile += snprintf(Makefile, max_len,
+"# creates and runs tests\n\
 .PHONY: check\n\
 check: CFLAGS += -g\n\
 check: test/initialize_repo_tests\n\
-    ./$^\n\
-\n\
-# Comprehensive test testing all dependencies\n\
+    ./$^\n\n");
+
+// Inititialize tests with libcheck
+Makefile += snprintf(Makefile, max_len,
+"# Comprehensive test testing all dependencies\n\
 test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n\
 test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
-    $(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests\n\
-";
+    $(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests\n");
 
-    return Makefile;
+END:
+    return strdup(buffer);
 }
 
 const char *generate_makefile_multi_program()

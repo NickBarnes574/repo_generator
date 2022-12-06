@@ -19,6 +19,7 @@ typedef struct
     bool n_flag;    // Used to set the truth value for the N flag
     char *repo_path;
     char **prog_names;
+    size_t num_prog_names;
 } options_t;
 
 /**

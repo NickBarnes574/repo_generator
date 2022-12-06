@@ -54,9 +54,7 @@ profile: $(TARGET)
 # delete the program and all the .o files
 .PHONY: clean
 clean:
-	$(RM) $(TARGET)
-	find . -type f -name "*.o" -exec rm -f {} \;
-	find . -type f -perm /111 -exec rm -f {} \;
+	$(RM) $(TARGET) *.o src/*.o include/*.o
 
 # creates and runs tests using valgrind
 .PHONY: valcheck

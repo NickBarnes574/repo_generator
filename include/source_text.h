@@ -6,6 +6,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "option_handler.h"
+
 /**
  * @brief Generates the contents of a .gitignore file for C
  * 
@@ -18,9 +20,7 @@ const char *generate_gitignore();
  * 
  * @return const char* 
  */
-const char *generate_makefile_single_program();
-
-const char *generate_makefile_multi_program();
+char *generate_makefile(options_t *options);
 
 /**
  * @brief Generates content for a custom exit_codes.c file

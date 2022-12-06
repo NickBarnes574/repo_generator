@@ -109,7 +109,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
     int option = 0;                 // Option used for getopt
     char program_name[] = "pk";
 
-    while ((option = getopt(argc, argv, "cpn:l:tah")) != -1)
+    while ((option = getopt(argc, argv, "c:p:n:l:tah")) != -1)
     {
         switch (option)
         {
@@ -124,6 +124,23 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                     goto END;
                 }
 
+                // Ignore a p_flag if passed
+                if (true == options->p_flag)
+                {
+                    break;
+                }
+
+                // Check if the directory exists
+                exit_code = directory_exists(optarg);
+                if (exit_code != E_DIRECTORY_EXISTS)
+                {
+                    printf("here\n");
+                    print_exit_message(exit_code);
+                    goto END;
+                }
+
+                // Directory is valid so set the directory path
+                options->repo_path = optarg;
                 options->c_flag = true;
                 break;
             
@@ -136,6 +153,12 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                     exit_code = E_INVALID_INPUT;
                     print_exit_message(exit_code);
                     goto END;
+                }
+
+                // Ignore a c_flag if passed
+                if (true == options->c_flag)
+                {
+                    break;
                 }
 
                 options->p_flag = true;
@@ -154,11 +177,12 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
 
                 options->n_flag = true;
                 options->prog_names = calloc(argc, sizeof(char **)); // Array for storing program names
+                options->num_prog_names = 0;
                 optind--;
                 size_t idx = 0;
 
                 // Allow an unlimited number of program names
-                while (optind < argc-1)
+                while (optind < argc)
                 {
                     if (NULL != strstr(argv[optind], "-"))
                     {
@@ -166,6 +190,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                     }
 
                     options->prog_names[idx] = argv[optind];
+                    options->num_prog_names += (idx + 1);
                     //printf("option %c with arg '%s'\n", option, argv[optind]);
                     idx++;
                     optind++;
@@ -200,23 +225,22 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
         }
     }
 
-    // Set the directory path only if it exists
-    char *directory;
-    if (optind <= argc)
-    {
-        directory = argv[optind-1];
+    // // Set the directory path only if it exists
+    // char *directory;
+    // if (optind <= argc)
+    // {
+    //     directory = argv[optind-1];
+    //     // Check if the directory exists
+    //     exit_code = directory_exists(directory);
+    //     if (exit_code != E_DIRECTORY_EXISTS)
+    //     {
+    //         print_exit_message(exit_code);
+    //         goto END;
+    //     }
 
-        // Check if the directory exists
-        exit_code = directory_exists(directory);
-        if (exit_code != E_DIRECTORY_EXISTS)
-        {
-            print_exit_message(exit_code);
-            goto END;
-        }
-
-        // Directory is valid so set the directory path
-        options->repo_path = directory;
-    }
+    //     // Directory is valid so set the directory path
+    //     options->repo_path = directory;
+    // }
 
     exit_code = E_SUCCESS;
 END:
