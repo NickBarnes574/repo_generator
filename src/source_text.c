@@ -75,6 +75,9 @@ static exit_code_t generate_program_names(char **Makefile, options_t *options, s
 
     char **prog_names = options->prog_names;
     size_t num_names = options->num_prog_names;
+    //DEBUG
+    printf("NUM_NAMES = [%ld]\n", num_names);
+    //DEBUG
 
     *Makefile += snprintf(*Makefile, max_len,
     "# the name of the output program(s)\n");
@@ -88,7 +91,7 @@ static exit_code_t generate_program_names(char **Makefile, options_t *options, s
     // Generate custom program name(s) passed in from the command line
     else
     {
-        for (size_t idx = 0; idx < num_names - 1; idx++)
+        for (size_t idx = 0; idx < num_names; idx++)
         {
             *Makefile += snprintf(*Makefile, max_len, "TARGET_%ld = %s\n", idx+1, prog_names[idx]);
         }
@@ -126,7 +129,7 @@ static exit_code_t generate_main_object_files(char **Makefile, options_t *option
     // Generate custom program name(s) passed in from the command line
     else
     {
-        for (size_t idx = 0; idx < num_names - 1; idx++)
+        for (size_t idx = 0; idx < num_names; idx++)
         {
             *Makefile += snprintf(*Makefile, max_len, "TARGET_%ld_MAIN = src/%s/main.o\n", idx+1, prog_names[idx]);
         }
@@ -139,7 +142,7 @@ END:
     return exit_code;
 }
 
-static exit_code_t default_func(char **Makefile, options_t *options, size_t max_len)
+static exit_code_t generate_other_object_files(char **Makefile, options_t *options, size_t max_len)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
@@ -149,16 +152,154 @@ static exit_code_t default_func(char **Makefile, options_t *options, size_t max_
         goto END;
     }
 
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    // Generate object files specific to each program
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            *Makefile += snprintf(*Makefile, max_len,
+            "# object files specific to %s\n", prog_names[idx]);
+
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "%s_OBJ = \\\n\n", temp);
+            free(temp);
+        }
+    }
+
+    // Generate common object files
+    *Makefile += snprintf(*Makefile, max_len,
+    "# common object files\n");
+    *Makefile += snprintf(*Makefile, max_len,
+    "COMMON_OBJ = \\\n\n");
+
     exit_code = E_SUCCESS;
 END:
     return exit_code;
 }
 
-char *generate_makefile(options_t *options)
+static exit_code_t generate_test_files(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# individual test files\n");
+
+    // Generate tests for each program
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "%s_TESTS = \n", temp);
+            free(temp);
+        }
+    }
+
+    // Generate default tests
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "PROJECT_TESTS = \n");
+    }
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t generate_combine_tests(char **Makefile, options_t *options, size_t max_len)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
     char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# combine all the tests into one list\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "ALL_TESTS = test/project_test_all.o ");
+
+    // Generate a combined list of tests by adding tests for each program
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s_TESTS)", temp);
+            free(temp);
+
+            // Add a space between tests unless it's the last test
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+        }
+    }
+
+    // Generate the default list of tests
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "$(PROJECT_TESTS)");
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+// static exit_code_t default_func(char **Makefile, options_t *options, size_t max_len)
+// {
+//     exit_code_t exit_code = E_DEFAULT_ERROR;
+
+//     if (NULL == Makefile || NULL == options)
+//     {
+//         exit_code = E_NULL_POINTER;
+//         goto END;
+//     }
+
+//     exit_code = E_SUCCESS;
+// END:
+//     return exit_code;
+// }
+
+char *generate_makefile(options_t *options)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
     size_t num_names = options->num_prog_names;
     size_t max_len = 5000;
     static char buffer[5000];
@@ -191,20 +332,28 @@ if (E_SUCCESS != exit_code)
 }
 
 // All other object files
-Makefile += snprintf(Makefile, max_len,
-"# all of the other object files outside of main\n\
-OBJ_FILES = \\\n\
-src/exit_codes.o \n\n");
+exit_code = generate_other_object_files(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Individual tests
-Makefile += snprintf(Makefile, max_len,
-"# individual tests\n\
-TEST_OBJ_FILES = #test/example_tests.o\n\n");
+exit_code = generate_test_files(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Test list
-Makefile += snprintf(Makefile, max_len,
-"# combine all the tests into one list\n\
-ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)\n\n");
+exit_code = generate_combine_tests(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Make all
 Makefile += snprintf(Makefile, max_len,

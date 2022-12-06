@@ -7,6 +7,7 @@
 #include <ctype.h>
 
 #include "option_handler.h"
+#include "string_functions.h"
 
 /**
  * @brief Generates the contents of a .gitignore file for C

@@ -190,8 +190,10 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                     }
 
                     options->prog_names[idx] = argv[optind];
-                    options->num_prog_names += (idx + 1);
-                    //printf("option %c with arg '%s'\n", option, argv[optind]);
+                    options->num_prog_names += 1;
+                    //DEBUG
+                    printf("option %c with arg '%s' = num_prog_name[%ld]\n", option, argv[optind], options->num_prog_names);
+                    //DEBUG
                     idx++;
                     optind++;
                 }

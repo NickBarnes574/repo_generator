@@ -19,6 +19,7 @@ src/dest_paths.o \
 src/option_handler.o \
 src/signal_handler.o \
 src/source_text.o \
+src/string_functions.o\
 src/user_input.o \
 src/printer.o
 
@@ -55,6 +56,7 @@ profile: $(TARGET)
 .PHONY: clean
 clean:
 	$(RM) $(TARGET) *.o src/*.o include/*.o
+	./pk_reset.sh
 
 # creates and runs tests using valgrind
 .PHONY: valcheck
