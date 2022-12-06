@@ -75,9 +75,6 @@ static exit_code_t generate_program_names(char **Makefile, options_t *options, s
 
     char **prog_names = options->prog_names;
     size_t num_names = options->num_prog_names;
-    //DEBUG
-    printf("NUM_NAMES = [%ld]\n", num_names);
-    //DEBUG
 
     *Makefile += snprintf(*Makefile, max_len,
     "# the name of the output program(s)\n");
@@ -93,7 +90,11 @@ static exit_code_t generate_program_names(char **Makefile, options_t *options, s
     {
         for (size_t idx = 0; idx < num_names; idx++)
         {
-            *Makefile += snprintf(*Makefile, max_len, "TARGET_%ld = %s\n", idx+1, prog_names[idx]);
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len, "%s = %s\n", temp, prog_names[idx]);
+            free(temp);
         }
     }
     *Makefile += snprintf(*Makefile, max_len,
@@ -120,10 +121,10 @@ static exit_code_t generate_main_object_files(char **Makefile, options_t *option
     *Makefile += snprintf(*Makefile, max_len,
     "# the object file(s) that contains main()\n");
 
-    // Generate a default MAIN_OBJ file
+    // Generate a default main object file
     if (num_names == 0)
     {
-        *Makefile += snprintf(*Makefile, max_len, "MAIN_OBJ = src/main.o\n");
+        *Makefile += snprintf(*Makefile, max_len, "TARGET_MAIN = src/main.o\n");
     }
 
     // Generate custom program name(s) passed in from the command line
@@ -131,7 +132,11 @@ static exit_code_t generate_main_object_files(char **Makefile, options_t *option
     {
         for (size_t idx = 0; idx < num_names; idx++)
         {
-            *Makefile += snprintf(*Makefile, max_len, "TARGET_%ld_MAIN = src/%s/main.o\n", idx+1, prog_names[idx]);
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len, "%s_MAIN = src/%s/main.o\n", temp, prog_names[idx]);
+            free(temp);
         }
     }
     *Makefile += snprintf(*Makefile, max_len,
@@ -231,14 +236,14 @@ static exit_code_t generate_combine_tests(char **Makefile, options_t *options, s
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    char **prog_names = options->prog_names;
-    size_t num_names = options->num_prog_names;
-
     if (NULL == Makefile || NULL == options)
     {
         exit_code = E_NULL_POINTER;
         goto END;
     }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
 
     *Makefile += snprintf(*Makefile, max_len,
     "# combine all the tests into one list\n");
@@ -281,6 +286,334 @@ END:
     return exit_code;
 }
 
+static exit_code_t make_all(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# make everything\n.PHONY: all\nall: ");
+
+    // Gather all the programs to make
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s)", temp);
+            free(temp);
+
+            // Add a space between tests unless it's the last test
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+        }
+    }
+
+    // Get the default program to make
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "$(TARGET)");
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t make_targets(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+    
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    // Generate the targets
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            // Add the depedencies for the target program
+            *Makefile += snprintf(*Makefile, max_len,
+            "# makes the %s program\n.PHONY: $(%s)\n%s: $(%s_MAIN) $(%s_OBJ) $(COMMON_OBJ)\n",
+            prog_names[idx], temp, prog_names[idx], temp, temp);
+
+            // Add the compiler flags
+            *Makefile += snprintf(*Makefile, max_len,
+            "\t$(CC) $(CFLAGS) $(%s_MAIN) $(%s_OBJ) $(COMMON_OBJ) -o $(%s)\n\n", temp, temp, temp);
+
+            free(temp);
+        }
+    }
+
+    // Make the default target
+    else
+    {
+        // Add the depedencies for the target program
+        *Makefile += snprintf(*Makefile, max_len,
+        "# makes the target program\n.PHONY: $(TARGET)\nprogram: $(TARGET_MAIN) $(TARGET_OBJ) $(COMMON_OBJ)\n");
+
+        // Add the compiler flags
+        *Makefile += snprintf(*Makefile, max_len,
+        "\t$(CC) $(CFLAGS) $(TARGET_MAIN) $(TARGET_OBJ) $(COMMON_OBJ) -o $(TARGET)\n\n");
+    }
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t make_debug(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# makes a debug version of the program(s) for use with valgrind\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    ".PHONY: debug\ndebug: CFLAGS += -g\ndebug: ");
+
+    // Make debug versions of each program
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s)", temp);
+
+            // Add a space between targets unless it's the last target
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+
+            free(temp);
+        }
+    }
+
+    // Make the default debug progam
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "$(TARGET)");
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t make_profile(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# makes a profile\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    ".PHONY: profile\nprofile: clean\nprofile: CFLAGS += -pg\nprofile: ");
+
+    // Make profiles of each program
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s)", temp);
+
+            // Add a space between targets unless it's the last target
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+
+            free(temp);
+        }
+    }
+
+    // Make the default debug profile
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "$(TARGET)");
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t make_clean(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# delete the program(s) and all the .o files\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    ".PHONY: clean\nclean:\n\t$(RM) ");
+
+    // Remove each program
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s)", temp);
+
+            // Add a space between targets unless it's the last target
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+
+            free(temp);
+        }
+    }
+
+    // Remove the default target
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "$(TARGET)");
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n\tfind . -type f -name \"*.o\" -exec rm -f {} \\;");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\n\n");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
+static exit_code_t run_tests(char **Makefile, options_t *options, size_t max_len)
+{
+    exit_code_t exit_code = E_DEFAULT_ERROR;
+
+    if (NULL == Makefile || NULL == options)
+    {
+        exit_code = E_NULL_POINTER;
+        goto END;
+    }
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "# Comprehensive test testing all dependencies\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "test/project_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "test/project_tests: $(CC) $(CFLAGS) $(ALL_TESTS) ");
+
+    // Add all the target programs
+    if (num_names > 0)
+    {
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s)", temp);
+
+            // Add a space between targets unless it's the last target
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+
+            free(temp);
+        }
+    }
+
+    // Add the default target program
+    else
+    {
+        *Makefile += snprintf(*Makefile, max_len,
+        "$(TARGET)");
+    }
+
+    *Makefile += snprintf(*Makefile, max_len,
+    " $(COMMON_OBJ) $(CHECKLIBS) -o test/project_tests");
+
+    exit_code = E_SUCCESS;
+END:
+    return exit_code;
+}
+
 // static exit_code_t default_func(char **Makefile, options_t *options, size_t max_len)
 // {
 //     exit_code_t exit_code = E_DEFAULT_ERROR;
@@ -291,6 +624,9 @@ END:
 //         goto END;
 //     }
 
+//     char **prog_names = options->prog_names;
+//     size_t num_names = options->num_prog_names;
+
 //     exit_code = E_SUCCESS;
 // END:
 //     return exit_code;
@@ -300,7 +636,6 @@ char *generate_makefile(options_t *options)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    size_t num_names = options->num_prog_names;
     size_t max_len = 5000;
     static char buffer[5000];
     char *Makefile = buffer;
@@ -356,89 +691,69 @@ if (E_SUCCESS != exit_code)
 }
 
 // Make all
-Makefile += snprintf(Makefile, max_len,
-"# make everything\n\
-.PHONY: all\n\
-all: $(MAIN_OBJ_FILE) $(OBJ_FILES) ");
-
-// Set only 1 target if a program name is not passed in
-if (num_names == 0)
+exit_code = make_all(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
 {
-    Makefile += snprintf(Makefile, max_len,
-    "$(TARGET)\n");
+    Makefile = NULL;
+    goto END;
 }
-
-// Set the number of targets that were passed in
-else
-{
-    for (size_t idx = 0; idx < num_names - 1; idx++)
-    {
-        Makefile += snprintf(Makefile, max_len, "$(TARGET_%ld)", idx+1);
-
-        // Add a space between targets unless it's the last target
-        if ((idx + 1) < (num_names - 1))
-        {
-            Makefile += snprintf(Makefile, max_len, " ");
-        }
-    }
-}
-Makefile += snprintf(Makefile, max_len,
-"\n\n");
 
 // Make the target(s)
-Makefile += snprintf(Makefile, max_len,
-"# makes the program\n\
-.PHONY: $(TARGET)\n\
-initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)\n\
-        $(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)\n\n");
+exit_code = make_targets(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Make debug
-Makefile += snprintf(Makefile, max_len,
-"# makes a debug version of the program for use with valgrind\n\
-.PHONY: debug\n\
-debug: CFLAGS += -g -gstabs -O0\n\
-debug: $(TARGET)\n\n");
+exit_code = make_debug(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Make profile
-Makefile += snprintf(Makefile, max_len,
-"# makes a profile\n\
-.PHONY: profile\n\
-profile: clean\n\
-profile: CFLAGS += -pg\n\
-profile: $(TARGET)\n\n");
+exit_code = make_profile(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Make clean
-Makefile += snprintf(Makefile, max_len,
-"# delete the program and all the .o files\n\
-.PHONY: clean\n\
-clean:\n\
-    $(RM) $(TARGET)\n\
-    find . -type f -name \"*.o\" -exec rm -f {} \\;\n\
-    find . -type f -perm /111 -exec rm -f {} \\;\n\n");
+exit_code = make_clean(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 // Create and run tests using valgrind
 Makefile += snprintf(Makefile, max_len,
 "# creates and runs tests using valgrind\n\
 .PHONY: valcheck\n\
 valcheck: CFLAGS += -g\n\
-valcheck: test/initialize_repo_tests\n\
+valcheck: test/project_tests\n\
 # disable forking in order to run tests with valgrind\n\
-    CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\n");
+\tCK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\n");
 
 // Create and run tests normally
 Makefile += snprintf(Makefile, max_len,
 "# creates and runs tests\n\
 .PHONY: check\n\
 check: CFLAGS += -g\n\
-check: test/initialize_repo_tests\n\
-    ./$^\n\n");
+check: test/project_tests\n\
+\t./$^\n\n");
 
-// Inititialize tests with libcheck
-Makefile += snprintf(Makefile, max_len,
-"# Comprehensive test testing all dependencies\n\
-test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n\
-test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
-    $(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests\n");
+// Run tests
+exit_code = run_tests(&Makefile, options, max_len);
+if (E_SUCCESS != exit_code)
+{
+    Makefile = NULL;
+    goto END;
+}
 
 END:
     return strdup(buffer);

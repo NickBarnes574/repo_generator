@@ -39,7 +39,7 @@ all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)
 # makes the program
 .PHONY: $(TARGET)
 pk: $(MAIN_OBJ_FILE) $(OBJ_FILES)
-		$(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)
+	$(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)
 
 # makes a debug version of the program for use with valgrind
 .PHONY: debug
