@@ -213,17 +213,34 @@ static exit_code_t generate_test_files(char **Makefile, options_t *options, size
             char *temp = str_toupper(prog_names[idx]);
 
             *Makefile += snprintf(*Makefile, max_len,
-            "%s_TESTS = \n", temp);
+            "%s_TESTS = ", temp);
+
+            if (num_names >= 2)
+            {
+                *Makefile += snprintf(*Makefile, max_len,
+                "test/%s_tests.o\n", options->prog_names[idx]);
+            }
+
+            else
+            {
+                *Makefile += snprintf(*Makefile, max_len,
+                "test/tests.o\n");
+            }
+
             free(temp);
         }
     }
-
+    
     // Generate default tests
     else
     {
         *Makefile += snprintf(*Makefile, max_len,
-        "PROJECT_TESTS = \n");
+        "PROJECT_TESTS = ");
+
+        *Makefile += snprintf(*Makefile, max_len,
+        "test/tests.o\n");
     }
+
     *Makefile += snprintf(*Makefile, max_len,
     "\n");
 
@@ -376,11 +393,11 @@ static exit_code_t make_targets(char **Makefile, options_t *options, size_t max_
     {
         // Add the depedencies for the target program
         *Makefile += snprintf(*Makefile, max_len,
-        "# makes the target program\n.PHONY: $(TARGET)\nprogram: $(TARGET_MAIN) $(TARGET_OBJ) $(COMMON_OBJ)\n");
+        "# makes the target program\n.PHONY: $(TARGET)\nprogram: $(TARGET_MAIN) $(COMMON_OBJ)\n");
 
         // Add the compiler flags
         *Makefile += snprintf(*Makefile, max_len,
-        "\t$(CC) $(CFLAGS) $(TARGET_MAIN) $(TARGET_OBJ) $(COMMON_OBJ) -o $(TARGET)\n\n");
+        "\t$(CC) $(CFLAGS) $(TARGET_MAIN) $(COMMON_OBJ) -o $(TARGET)\n\n");
     }
 
     exit_code = E_SUCCESS;

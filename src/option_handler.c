@@ -9,24 +9,21 @@ void usage(char *program_name)
     }
     // Usage
     printf("\n\033[1mUSAGE\033[m\n");
-    printf("    %s [options] <project_path>\n", program_name);
+    printf("    %s [-c <project_path>] [-p <project_path>] [-n <program_name(s)...>]\n", program_name);
 
     // Options
     printf("\n\033[1mOPTIONS\033[m\n");
     printf("    \033[1m-c\033[m     generate a C project\n");
     printf("    \033[1m-p\033[m     generate a Python project\n");
-    printf("    \033[1m-l\033[m     specify a save location for source data\n");
     printf("    \033[1m-n\033[m     specify a program name(s) for your project\n");
-    printf("    \033[1m-t\033[m     generate a template directory\n");
-    printf("    \033[1m-a\033[m     generate advanced file structure (getopt, signal handler)\n");
     printf("\n    For a full listing of options and detailed descriptions, use %s --help.\n", program_name);
 
     // Examples
     printf("\n\033[1mEXAMPLES\033[m\n");
     printf("    Example 1 (C):\n");
-    printf("        $ ./%s -c /home/user/project/\n", program_name);
+    printf("        $ ./%s -c /home/user/project -n encode decode\n", program_name);
     printf("\n    Example 2 (Python):\n");
-    printf("        $ ./%s -p /home/user/project/\n", program_name);
+    printf("        $ ./%s -p /home/user/project\n", program_name);
 
 END:
     return;
@@ -55,23 +52,20 @@ void help(char *program_name)
 
     // Usage
     printf("\n\033[1mUSAGE\033[m\n");
-    printf("    %s [options] <project_path>\n", program_name);
+    printf("    %s [-c <project_path>] [-p <project_path>] [-n <program_name(s)...>]\n", program_name);
 
     // Options
     printf("\n\033[1mOPTIONS\033[m\n");
     printf("    \033[1m-c\033[m     generate a C project\n");
     printf("    \033[1m-p\033[m     generate a Python project\n");
-    printf("    \033[1m-l\033[m     specify a save location for source data\n");
     printf("    \033[1m-n\033[m     specify a program name(s) for your project\n");
-    printf("    \033[1m-t\033[m     generate a template directory\n");
-    printf("    \033[1m-a\033[m     generate advanced file structure (getopt, signal handler)\n");
 
     // Examples
     printf("\n\033[1mEXAMPLES\033[m\n");
     printf("    Example 1 (C):\n");
-    printf("        $ ./%s -c /home/user/project/\n", program_name);
+    printf("        $ ./%s -c /home/user/project -n encode decode\n", program_name);
     printf("\n    Example 2 (Python):\n");
-    printf("        $ ./%s -p /home/user/project/\n", program_name);
+    printf("        $ ./%s -p /home/user/project\n", program_name);
 
 
 END:

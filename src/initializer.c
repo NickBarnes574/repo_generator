@@ -541,12 +541,11 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
                 char *custom_file_include = append_path(custom_dir_include, "main.h");
                 exit_code = initialize_file(custom_file_include, main_h, true);
 
-                // Create the 'test/prog_name_tests' paths
-                char *custom_dir_test = append_path(dest_paths[DEST_DIR_TEST], options->prog_names[idx]);
-                exit_code = initialize_directory(custom_dir_test, false);
-
-                char *custom_file_test = append_path(dest_paths[DEST_DIR_TEST], options->prog_names[idx]);
-                custom_file_test = append_path(custom_file_test, "_tests.c");
+                // Create the test files for each program
+                char temp[300] = "";
+                strcpy(temp, options->prog_names[idx]);
+                strcat(temp, "_tests.c");
+                char *custom_file_test = append_path(dest_paths[DEST_DIR_TEST], temp);
                 exit_code = initialize_file(custom_file_test, main_h, true);
 
                 free(custom_dir_src);
@@ -561,6 +560,30 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
                 }
             }
             free(main_file_contents);
+        }
+
+        else
+        {
+            // Initialize 'main.c'
+            exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_C], main_c, true);
+            if (E_SUCCESS != exit_code)
+            {
+                goto END;
+            }
+
+            // Initialize 'main.h'
+            exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_H], main_h, true);
+            if (E_SUCCESS != exit_code)
+            {
+                goto END;
+            }
+
+            // Initialize 'tests.c'
+            exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c, true);
+            if (E_SUCCESS != exit_code)
+            {
+                goto END;
+            }
         }
     }
 
@@ -579,6 +602,13 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
         {
             goto END;
         }
+
+        // Initialize 'tests.c'
+        exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c, true);
+        if (E_SUCCESS != exit_code)
+        {
+            goto END;
+        }
     }
 
     // Initialize 'exit_c'
@@ -590,13 +620,6 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
 
     // Initialize 'exit_h'
     exit_code = initialize_file(dest_paths[DEST_FILE_EXIT_CODES_H], exit_h, true);
-    if (E_SUCCESS != exit_code)
-    {
-        goto END;
-    }
-
-    // Initialize 'tests.c'
-    exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c, true);
     if (E_SUCCESS != exit_code)
     {
         goto END;
