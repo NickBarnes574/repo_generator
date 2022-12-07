@@ -103,7 +103,7 @@ char **generate_src_paths()
         src_paths[SRC_FILE_TESTS] = append_path(test, "tests.c");
 
         // test_all.c
-        src_paths[SRC_FILE_TEST_ALL] = append_path(test, "projec_test_all.c");
+        src_paths[SRC_FILE_TEST_ALL] = append_path(test, "project_test_all.c");
 
     /********************************************************
      * NAME: TEMPLATES

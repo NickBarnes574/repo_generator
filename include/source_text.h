@@ -55,6 +55,10 @@ const char *generate_main_h();
 
 const char *generate_test_c();
 
+char *generate_custom_test_c(options_t *options, size_t idx);
+
 const char *generate_test_all_c();
+
+const char *generate_custom_test_all_c(options_t *options);
 
 #endif

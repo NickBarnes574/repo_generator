@@ -86,7 +86,7 @@ char **generate_dest_paths(const char *path)
         dest_paths[DEST_FILE_TESTS] = append_path(test, "tests.c");
 
         // test_all.c
-        dest_paths[DEST_FILE_TEST_ALL] = append_path(test, "test_all.c");
+        dest_paths[DEST_FILE_TEST_ALL] = append_path(test, "project_test_all.c");
 
     /********************************************************
      * NAME: TEMPLATES

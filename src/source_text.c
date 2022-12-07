@@ -130,12 +130,23 @@ static exit_code_t generate_main_object_files(char **Makefile, options_t *option
     // Generate custom program name(s) passed in from the command line
     else
     {
-        for (size_t idx = 0; idx < num_names; idx++)
+        if (num_names >= 2)
+        {
+            for (size_t idx = 0; idx < num_names; idx++)
+            {
+                // Convert program names to upper case
+                char *temp = str_toupper(prog_names[idx]);
+
+                *Makefile += snprintf(*Makefile, max_len, "%s_MAIN = src/%s/main.o\n", temp, prog_names[idx]);
+                free(temp);
+            }
+        }
+        else
         {
             // Convert program names to upper case
-            char *temp = str_toupper(prog_names[idx]);
+            char *temp = str_toupper(prog_names[0]);
 
-            *Makefile += snprintf(*Makefile, max_len, "%s_MAIN = src/%s/main.o\n", temp, prog_names[idx]);
+            *Makefile += snprintf(*Makefile, max_len, "%s_MAIN = src/main.o\n", temp);
             free(temp);
         }
     }
@@ -593,10 +604,10 @@ static exit_code_t run_tests(char **Makefile, options_t *options, size_t max_len
     "test/project_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n");
 
     *Makefile += snprintf(*Makefile, max_len,
-    "test/project_tests: $(CC) $(CFLAGS) $(ALL_TESTS) ");
+    "test/project_tests: $(ALL_TESTS) ");
 
     // Add all the target programs
-    if (num_names > 0)
+    if (num_names >= 2)
     {
         for (size_t idx = 0; idx < num_names; idx++)
         {
@@ -604,7 +615,7 @@ static exit_code_t run_tests(char **Makefile, options_t *options, size_t max_len
             char *temp = str_toupper(prog_names[idx]);
 
             *Makefile += snprintf(*Makefile, max_len,
-            "$(%s)", temp);
+            "$(%s_OBJ)", temp);
 
             // Add a space between targets unless it's the last target
             if ((idx + 1) < (num_names))
@@ -616,11 +627,30 @@ static exit_code_t run_tests(char **Makefile, options_t *options, size_t max_len
         }
     }
 
-    // Add the default target program
-    else
+    *Makefile += snprintf(*Makefile, max_len,
+    " $(COMMON_OBJ)\n");
+
+    *Makefile += snprintf(*Makefile, max_len,
+    "\t$(CC) $(CFLAGS) $(ALL_TESTS) ");
+
+    if (num_names >= 2)
     {
-        *Makefile += snprintf(*Makefile, max_len,
-        "$(TARGET)");
+        for (size_t idx = 0; idx < num_names; idx++)
+        {
+            // Convert program names to upper case
+            char *temp = str_toupper(prog_names[idx]);
+
+            *Makefile += snprintf(*Makefile, max_len,
+            "$(%s_OBJ)", temp);
+
+            // Add a space between targets unless it's the last target
+            if ((idx + 1) < (num_names))
+            {
+                *Makefile += snprintf(*Makefile, max_len, " ");
+            }
+
+            free(temp);
+        }
     }
 
     *Makefile += snprintf(*Makefile, max_len,
@@ -761,8 +791,7 @@ END:
 const char *generate_exit_codes_c()
 {
     static const char *exit_codes_c =
-"\n\
-#include \"exit_codes.h\"\n\
+"#include \"exit_codes.h\"\n\
 \n\
 // Citation:\n\
 // https://stackoverflow.com/questions/6286874/c-naming-suggestion-for-error-code-enums\n\
@@ -837,8 +866,7 @@ void print_exit_message(exit_code_t exit_code)\n\
 const char *generate_exit_codes_h()
 {
     static const char *exit_codes_h =
-"\n\
-#ifndef EXIT_CODES_H\n\
+"#ifndef EXIT_CODES_H\n\
 #define EXIT_CODES_H\n\
 \n\
 #include <stdio.h>\n\
@@ -915,7 +943,7 @@ char *generate_custom_main_c(options_t *options, size_t idx)
     char **prog_names = options->prog_names;
 
     main += snprintf(main, max_len,
-    "#include %s/main.c\n\n", prog_names[idx]);
+    "#include \"%s/main.h\"\n\n", prog_names[idx]);
 
     main += snprintf(main, max_len,
     "int main(int argc, char **argv)\n{\n");
@@ -932,8 +960,7 @@ char *generate_custom_main_c(options_t *options, size_t idx)
 const char *generate_main_c()
 {
     static const char *main_c =
-"\n\
-#include \"main.h\"\n\
+"#include \"main.h\"\n\
 \n\
 int main(int argc, char **argv)\n\
 {\n\
@@ -950,8 +977,7 @@ END:\n\
 const char *generate_main_h()
 {
     static const char *main_h =
-"\n\
-#ifndef MAIN_H\n\
+"#ifndef MAIN_H\n\
 #define MAIN_H\n\
 \n\
 #include <stdio.h>\n\
@@ -968,10 +994,11 @@ const char *generate_main_h()
 const char *generate_test_c()
 {
     static const char *tests_c =
-"\n\
-#include <check.h>\n\
+"#include <check.h>\n\
 #include <stdio.h>\n\
 #include <stdlib.h>\n\
+\n\
+#include \"exit_codes.h\"\n\
 \n\
 // // TEST CASE\n\
 // //***********************************************************************************************\n\
@@ -1011,18 +1038,88 @@ Suite *project_test_suite(void)\n\
     // add_tests(XXXX_test_cases, XXXX_test_list);\n\
     // suite_add_tcase(project_test_suite, XXXX_test_cases);\n\
 \n\
-    return trie_test_suite;\n\
+    return project_test_suite;\n\
 }\n\
 ";
 
     return tests_c;
 }
 
+char *generate_custom_test_c(options_t *options, size_t idx)
+{
+    if (NULL == options)
+    {
+        return NULL;
+    }
+
+    size_t max_len = 5000;
+    static char buffer[5000];
+    char *main = buffer;
+
+    char **prog_names = options->prog_names;
+    
+    main += snprintf(main, max_len,
+    "#include <check.h>\n\
+#include <stdio.h>\n\
+#include <stdlib.h>\n\
+\n\
+#include \"exit_codes.h\"\n\
+\n\
+// // TEST CASE\n\
+// //***********************************************************************************************\n\
+// // XXXX TESTS\n\
+// START_TEST(test_YYYY)\n\
+// {\n\
+\n\
+// }\n\
+// END_TEST\n\
+\n\
+// // TEST LIST\n\
+// static TFun XXXX_tests[] =\n\
+// {\n\
+//     test_YYYY,\n\
+//     NULL\n\
+// };\n\
+\n\
+static void add_tests(TCase * test_cases, TFun * test_functions)\n\
+{\n\
+    while (* test_functions)\n\
+    {\n\
+        // add the test from the core_tests array to the tcase\n\
+        tcase_add_test(test_cases, * test_functions);\n\
+        test_functions++;\n\
+    }\n\
+}\n\
+\n");
+    
+    main += snprintf(main, max_len,
+    "Suite *%s_test_suite(void)\n", prog_names[idx]);
+
+    main += snprintf(main, max_len,
+    "{\n\tSuite *%s_test_suite = suite_create(\"%s tests\");\n", prog_names[idx], prog_names[idx]);
+
+    main += snprintf(main, max_len,
+    "\n\
+    // CREATE TESTS\n\
+\n\
+    // //Create XXXX tests\n\
+    // TFun *XXXX_test_list = XXXX_tests;\n\
+    // TCase *XXXX_test_cases = tcase_create(\" XXXX() Tests\");\n\
+    // add_tests(XXXX_test_cases, XXXX_test_list);\n");
+
+    main += snprintf(main, max_len,
+    "    // suite_add_tcase(%s_test_suite, XXXX_test_cases);\n\
+\n\
+    return %s_test_suite;\n\
+}", prog_names[idx], prog_names[idx]);
+
+    return strdup(buffer);
+}
+
 const char *generate_test_all_c()
 {
     const char *test_all_c =
-"\n\
-#include <check.h>\n\
+"#include <check.h>\n\
 \n\
 extern Suite *project_test_suite(void);\n\
 \n\
@@ -1050,4 +1147,61 @@ int main(int argc, char** argv)\n\
 ";
 
     return test_all_c;
+}
+
+const char *generate_custom_test_all_c(options_t *options)
+{
+    if (NULL == options)
+    {
+        return NULL;
+    }
+
+    size_t max_len = 5000;
+    static char buffer[5000];
+    char *main = buffer;
+
+    char **prog_names = options->prog_names;
+    size_t num_names = options->num_prog_names;
+    
+    main += snprintf(main, max_len,
+"#include <check.h>\n\
+\n");
+
+for (size_t idx = 0; idx < num_names; idx++)
+{
+    main += snprintf(main, max_len,
+    "extern Suite *%s_test_suite(void);\n", prog_names[idx]);
+}
+
+    main += snprintf(main, max_len,
+"\nint main(int argc, char** argv)\n\
+{\n\
+  // Suppress unused parameter warnings\n\
+  (void) argv[argc];\n\
+\n\
+  // create test suite runner\n\
+  SRunner *sr = srunner_create(NULL);\n\
+\n\
+  // prepare the test suites\n");
+
+for (size_t idx = 0; idx < num_names; idx++)
+{
+    main += snprintf(main, max_len,
+"  srunner_add_suite(sr, %s_test_suite());\n", prog_names[idx]);
+}
+
+    main += snprintf(main, max_len,
+"\n  // run the test suites\n\
+  srunner_run_all(sr, CK_VERBOSE);\n\
+\n\
+  // report the test failed status\n\
+  int tests_failed = srunner_ntests_failed(sr);\n\
+  srunner_free(sr);\n\
+\n\
+  // return 1 or 0 based on whether or not tests failed\n\
+  return (tests_failed == 0) ? 0 : 1;\n\
+}\n\
+");
+
+    return strdup(buffer);
 }

@@ -514,6 +514,7 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
     const char *test_c = generate_test_c();
     const char *test_all_c = generate_test_all_c();
     char *def_makefile = generate_makefile(options);
+    char *custom_test_all = generate_custom_test_all_c(options);
     const char *gitignore = generate_gitignore();
 
     if (options->num_prog_names > 0)
@@ -522,6 +523,7 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
         if (options->num_prog_names >= 2)
         {
             char **main_file_contents = calloc(options->num_prog_names, sizeof(char**));
+            char **test_file_contents = calloc(options->num_prog_names, sizeof(char**));
             for (size_t idx = 0; idx < options->num_prog_names; idx++)
             {
                 // Create the 'src/prog_name' paths
@@ -546,7 +548,8 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
                 strcpy(temp, options->prog_names[idx]);
                 strcat(temp, "_tests.c");
                 char *custom_file_test = append_path(dest_paths[DEST_DIR_TEST], temp);
-                exit_code = initialize_file(custom_file_test, main_h, true);
+                test_file_contents[idx] = generate_custom_test_c(options, idx);
+                exit_code = initialize_file(custom_file_test, test_file_contents[idx], true);
 
                 free(custom_dir_src);
                 free(custom_file_src);
@@ -554,12 +557,17 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
                 free(custom_file_include);
                 free(custom_file_test);
                 free(main_file_contents[idx]);
+                free(test_file_contents[idx]);
                 if (E_SUCCESS != exit_code)
                 {
                     goto END;
                 }
             }
+
+            // Create the test all
+            exit_code = initialize_file(dest_paths[DEST_FILE_TEST_ALL], custom_test_all, true);
             free(main_file_contents);
+            free(test_file_contents);
         }
 
         else
@@ -580,6 +588,13 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
 
             // Initialize 'tests.c'
             exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c, true);
+            if (E_SUCCESS != exit_code)
+            {
+                goto END;
+            }
+
+            // Initialize 'test_all.c'
+            exit_code = initialize_file(dest_paths[DEST_FILE_TEST_ALL], test_all_c, true);
             if (E_SUCCESS != exit_code)
             {
                 goto END;
@@ -605,6 +620,13 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
 
         // Initialize 'tests.c'
         exit_code = initialize_file(dest_paths[DEST_FILE_TESTS], test_c, true);
+        if (E_SUCCESS != exit_code)
+        {
+            goto END;
+        }
+    
+        // Initialize 'test_all.c'
+        exit_code = initialize_file(dest_paths[DEST_FILE_TEST_ALL], test_all_c, true);
         if (E_SUCCESS != exit_code)
         {
             goto END;
@@ -649,5 +671,6 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
     exit_code = E_SUCCESS;
 END:
     free(def_makefile);
+    free(custom_test_all);
     return exit_code;
 }
