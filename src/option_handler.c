@@ -37,7 +37,7 @@ void help(char *program_name)
     }
     // Summary
     printf("\n\033[1mSUMMARY\033[m\n");
-    printf("    %s - Project file generator for C\n", program_name);
+    printf("    %s - Project generator for C\n", program_name);
 
     // Description
     printf("\n\033[1mDESCRIPTION\033[m\n");
@@ -47,6 +47,13 @@ void help(char *program_name)
     printf("\n    -Files generated for C projects loosely follow the BARR-C standard\n");
     printf("\n    For more information on files and file structure see the %s(1)\n", program_name);
     printf("    manpage (\"man %s\").\n", program_name);
+
+    // Features
+    printf("\n\033[1mFEATURES\033[m\n");
+    printf("    - Generated files and directories (src, include, docs, test)\n");
+    printf("    - Generated Makefiles for single and multiple programs\n");
+    printf("    - Generated test files for unit testing\n");
+    printf("    - Subdirectory organization when creating multiple programs\n");
 
     // Usage
     printf("\n\033[1mUSAGE\033[m\n");
