@@ -519,27 +519,41 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
     if (options->num_prog_names > 0)
     {
         // Generate main.c inside 'src' sub directories if any program names were passed on the command line
-        if (options->num_prog_names > 0)
+        if (options->num_prog_names >= 2)
         {
             char **main_file_contents = calloc(options->num_prog_names, sizeof(char**));
             for (size_t idx = 0; idx < options->num_prog_names; idx++)
             {
+                // Create the 'src/prog_name' paths
                 char *custom_dir_src = append_path(dest_paths[DEST_DIR_SRC], options->prog_names[idx]);
-                char *custom_file_src = append_path(custom_dir_src, "main.c");
                 exit_code = initialize_directory(custom_dir_src, false);
 
+                // Create the custom 'main.c' files for each program
+                char *custom_file_src = append_path(custom_dir_src, "main.c");
                 main_file_contents[idx] = generate_custom_main_c(options, idx);
                 exit_code = initialize_file(custom_file_src, main_file_contents[idx], true);
 
+                // Create the 'include/prog_name' paths
                 char *custom_dir_include = append_path(dest_paths[DEST_DIR_INCLUDE], options->prog_names[idx]);
-                char *custom_file_include = append_path(custom_dir_include, "main.h");
                 exit_code = initialize_directory(custom_dir_include, false);
+
+                // Create the 'main.h' files for each program
+                char *custom_file_include = append_path(custom_dir_include, "main.h");
                 exit_code = initialize_file(custom_file_include, main_h, true);
+
+                // Create the 'test/prog_name_tests' paths
+                char *custom_dir_test = append_path(dest_paths[DEST_DIR_TEST], options->prog_names[idx]);
+                exit_code = initialize_directory(custom_dir_test, false);
+
+                char *custom_file_test = append_path(dest_paths[DEST_DIR_TEST], options->prog_names[idx]);
+                custom_file_test = append_path(custom_file_test, "_tests.c");
+                exit_code = initialize_file(custom_file_test, main_h, true);
 
                 free(custom_dir_src);
                 free(custom_file_src);
                 free(custom_dir_include);
                 free(custom_file_include);
+                free(custom_file_test);
                 free(main_file_contents[idx]);
                 if (E_SUCCESS != exit_code)
                 {
