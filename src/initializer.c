@@ -166,7 +166,7 @@ exit_code_t initialize_destination_data(options_t *options, char **dest_paths)
 
     if (true == options->c_flag)
     {
-        exit_code = init_c_dest_directories(dest_paths);
+        exit_code = init_c_dest_directories(dest_paths, options);
         if (E_SUCCESS != exit_code)
         {
             goto END;
@@ -403,8 +403,11 @@ END:
     return exit_code;
 }
 
-exit_code_t init_c_dest_directories(char **dest_paths)
+exit_code_t init_c_dest_directories(char **dest_paths, options_t *options)
 {
+    //DEBUG
+    (void)options;
+    //DEBUG
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
     if (NULL == dest_paths)
@@ -429,12 +432,42 @@ exit_code_t init_c_dest_directories(char **dest_paths)
         goto END;
     }
 
+    // // Generate 'src' sub directories if any program names were passed on the command line
+    // if (options->num_prog_names > 0)
+    // {
+    //     for (size_t idx = 0; idx < options->num_prog_names; idx++)
+    //     {
+    //         char *custom_directory = append_path(dest_paths[DEST_DIR_SRC], options->prog_names[idx]);
+    //         exit_code = initialize_directory(custom_directory, false);
+    //         free(custom_directory);
+    //         if (E_SUCCESS != exit_code)
+    //         {
+    //             goto END;
+    //         }
+    //     }
+    // }
+
     // Initialize 'include' directory
     exit_code = initialize_directory(dest_paths[DEST_DIR_INCLUDE], false);
     if (E_SUCCESS != exit_code)
     {
         goto END;
     }
+
+    // // Generate 'include' sub directories if any program names were passed on the command line
+    // if (options->num_prog_names > 0)
+    // {
+    //     for (size_t idx = 0; idx < options->num_prog_names; idx++)
+    //     {
+    //         char *custom_directory = append_path(dest_paths[DEST_DIR_INCLUDE], options->prog_names[idx]);
+    //         exit_code = initialize_directory(custom_directory, false);
+    //         free(custom_directory);
+    //         if (E_SUCCESS != exit_code)
+    //         {
+    //             goto END;
+    //         }
+    //     }
+    // }
 
     // Initialize 'docs' directory
     exit_code = initialize_directory(dest_paths[DEST_DIR_DOCS], false);
@@ -483,18 +516,55 @@ exit_code_t init_c_dest_files(char **dest_paths, options_t *options)
     char *def_makefile = generate_makefile(options);
     const char *gitignore = generate_gitignore();
 
-    // Initialize 'main.c'
-    exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_C], main_c, true);
-    if (E_SUCCESS != exit_code)
+    if (options->num_prog_names > 0)
     {
-        goto END;
+        // Generate main.c inside 'src' sub directories if any program names were passed on the command line
+        if (options->num_prog_names > 0)
+        {
+            char **main_file_contents = calloc(options->num_prog_names, sizeof(char**));
+            for (size_t idx = 0; idx < options->num_prog_names; idx++)
+            {
+                char *custom_dir_src = append_path(dest_paths[DEST_DIR_SRC], options->prog_names[idx]);
+                char *custom_file_src = append_path(custom_dir_src, "main.c");
+                exit_code = initialize_directory(custom_dir_src, false);
+
+                main_file_contents[idx] = generate_custom_main_c(options, idx);
+                exit_code = initialize_file(custom_file_src, main_file_contents[idx], true);
+
+                char *custom_dir_include = append_path(dest_paths[DEST_DIR_INCLUDE], options->prog_names[idx]);
+                char *custom_file_include = append_path(custom_dir_include, "main.h");
+                exit_code = initialize_directory(custom_dir_include, false);
+                exit_code = initialize_file(custom_file_include, main_h, true);
+
+                free(custom_dir_src);
+                free(custom_file_src);
+                free(custom_dir_include);
+                free(custom_file_include);
+                free(main_file_contents[idx]);
+                if (E_SUCCESS != exit_code)
+                {
+                    goto END;
+                }
+            }
+            free(main_file_contents);
+        }
     }
 
-    // Initialize 'main.h'
-    exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_H], main_h, true);
-    if (E_SUCCESS != exit_code)
+    else
     {
-        goto END;
+        // Initialize 'main.c'
+        exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_C], main_c, true);
+        if (E_SUCCESS != exit_code)
+        {
+            goto END;
+        }
+
+        // Initialize 'main.h'
+        exit_code = initialize_file(dest_paths[DEST_FILE_MAIN_H], main_h, true);
+        if (E_SUCCESS != exit_code)
+        {
+            goto END;
+        }
     }
 
     // Initialize 'exit_c'

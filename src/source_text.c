@@ -614,24 +614,6 @@ END:
     return exit_code;
 }
 
-// static exit_code_t default_func(char **Makefile, options_t *options, size_t max_len)
-// {
-//     exit_code_t exit_code = E_DEFAULT_ERROR;
-
-//     if (NULL == Makefile || NULL == options)
-//     {
-//         exit_code = E_NULL_POINTER;
-//         goto END;
-//     }
-
-//     char **prog_names = options->prog_names;
-//     size_t num_names = options->num_prog_names;
-
-//     exit_code = E_SUCCESS;
-// END:
-//     return exit_code;
-// }
-
 char *generate_makefile(options_t *options)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
@@ -757,81 +739,6 @@ if (E_SUCCESS != exit_code)
 
 END:
     return strdup(buffer);
-}
-
-const char *generate_makefile_multi_program()
-{
-    static const char *Makefile =
-
-"# required options\n\
-CFLAGS += -Wall -Wextra -Wpedantic -Waggregate-return -Wwrite-strings -Wfloat-equal -Wvla\n\
-\n\
-# add header files to the compile path\n\
-CFLAGS += -I ./include/\n\
-\n\
-# the object file which contains main\n\
-MAIN_OBJ_FILE = src/main.o\n\
-\n\
-# all of the other object files outside of main\n\
-OBJ_FILES = \\\n\
-src/exit_codes.o \n\
-\n\
-# the name of the output program\n\
-TARGET = #PROGRAM_NAME\n\
-\n\
-# individual tests\n\
-TEST_OBJ_FILES = #test/example_tests.o\n\
-\n\
-# combine all the tests into one list\n\
-ALL_TESTS = test/initialize_repo_test_all.o $(TEST_OBJ_FILES)\n\
-\n\
-# make everything\n\
-.PHONY: all\n\
-all: $(MAIN_OBJ_FILE) $(OBJ_FILES) $(TARGET)\n\
-\n\
-# makes the program\n\
-.PHONY: $(TARGET)\n\
-initialize_repo: $(MAIN_OBJ_FILE) $(OBJ_FILES)\n\
-        $(CC) $(CFLAGS) $(MAIN_OBJ_FILE) $(OBJ_FILES) -o $(TARGET)\n\
-\n\
-# makes a debug version of the program for use with valgrind\n\
-.PHONY: debug\n\
-debug: CFLAGS += -g -gstabs -O0\n\
-debug: $(TARGET)\n\
-\n\
-# makes a profile\n\
-.PHONY: profile\n\
-profile: clean\n\
-profile: CFLAGS += -pg\n\
-profile: $(TARGET)\n\
-\n\
-# delete the program and all the .o files\n\
-.PHONY: clean\n\
-clean:\n\
-    $(RM) $(TARGET)\n\
-    find . -type f -name \"*.o\" -exec rm -f {} \\;\n\
-    find . -type f -perm /111 -exec rm -f {} \\;\n\
-\n\
-# creates and runs tests using valgrind\n\
-.PHONY: valcheck\n\
-valcheck: CFLAGS += -g\n\
-valcheck: test/initialize_repo_tests\n\
-# disable forking in order to run tests with valgrind\n\
-    CK_FORK=no valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./$^\n\
-\n\
-# creates and runs tests\n\
-.PHONY: check\n\
-check: CFLAGS += -g\n\
-check: test/initialize_repo_tests\n\
-    ./$^\n\
-\n\
-# Comprehensive test testing all dependencies\n\
-test/initialize_repo_tests: CHECKLIBS = -lcheck -lm -lrt -lpthread -lsubunit\n\
-test/initialize_repo_tests: $(ALL_TESTS) $(OBJ_FILES)\n\
-    $(CC) $(CFLAGS) $(ALL_TESTS) $(OBJ_FILES) $(CHECKLIBS) -o test/initialize_repo_tests\n\
-";
-
-    return Makefile;
 }
 
 const char *generate_exit_codes_c()
@@ -975,6 +882,34 @@ void print_exit_message(exit_code_t exit_code);\n\
 ";
 
     return exit_codes_h;
+}
+
+char *generate_custom_main_c(options_t *options, size_t idx)
+{
+    if (NULL == options)
+    {
+        return NULL;
+    }
+
+    size_t max_len = 5000;
+    static char buffer[5000];
+    char *main = buffer;
+
+    char **prog_names = options->prog_names;
+
+    main += snprintf(main, max_len,
+    "#include %s/main.c\n\n", prog_names[idx]);
+
+    main += snprintf(main, max_len,
+    "int main(int argc, char **argv)\n{\n");
+
+    main += snprintf(main, max_len,
+    "\texit_code_t exit_code = E_DEFAULT_ERROR;\n\nEND:\n");
+
+    main += snprintf(main, max_len,
+    "\treturn exit_code;\n}");
+
+    return strdup(buffer);
 }
 
 const char *generate_main_c()

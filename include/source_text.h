@@ -44,6 +44,8 @@ const char *generate_exit_codes_h();
  */
 const char *generate_main_c();
 
+char *generate_custom_main_c(options_t *options, size_t idx);
+
 /**
  * @brief Generates content for a main.h header file
  * 

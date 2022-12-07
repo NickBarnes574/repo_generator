@@ -316,8 +316,8 @@ char *append_path(const char *source_path, const char *dest_name)
         return NULL;
     }
 
-    // Allocate a path size of up to 256 characters and a NULL terminator
-    char *destination_path = calloc(1, 257);
+    // Allocate a path size of up to 499 characters and a NULL terminator
+    char *destination_path = calloc(1, 500);
     if (NULL == destination_path)
     {
         return NULL;
