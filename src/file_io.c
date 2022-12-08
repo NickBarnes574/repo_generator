@@ -236,7 +236,7 @@ exit_code_t copy_file(const char *dest_file_name, const char *src_file_name)
 {
     exit_code_t exit_code = E_DEFAULT_ERROR;
 
-    if (NULL == dest_file_name || NULL == src_file_name)
+    if ((NULL == dest_file_name) || (NULL == src_file_name))
     {
         exit_code = E_NULL_POINTER;
         goto END;
@@ -323,6 +323,7 @@ char *append_path(const char *source_path, const char *dest_name)
         return NULL;
     }
 
+    // USE SNPRINTF HERE
     strcpy(destination_path, source_path);
     strncat(destination_path, "/", 2);
     strncat(destination_path, dest_name, strlen(dest_name) + 1);

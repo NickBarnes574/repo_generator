@@ -66,11 +66,12 @@ void help(char *program_name)
 
     // Examples
     printf("\n\033[1mEXAMPLES\033[m\n");
-    printf("    Example 1 (C):\n");
-    printf("        $ ./%s -c /home/user/project -n encode decode\n", program_name);
-    printf("\n    Example 2 (C):\n");
-    printf("        $ ./%s -c /home/user/project\n", program_name);
-
+    printf("    Example 1 (one program, no name):\n");
+    printf("        $ ./%s -c /home/user/project\n\n", program_name);
+    printf("    Example 2 (one program with name):\n");
+    printf("        $ ./%s -c /home/user/project -n encode\n\n", program_name);
+    printf("    Example 3 (multiple programs with names):\n");
+    printf("        $ ./%s -c /home/user/project -n encode decode\n\n", program_name);
 
 END:
     return;
@@ -187,6 +188,12 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                 exit_code = E_INVALID_INPUT;
                 goto END;
         }
+    }
+
+    if (optind <= argc)
+    {
+        usage(program_name);
+        goto END;
     }
 
     // // Set the directory path only if it exists
