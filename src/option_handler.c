@@ -175,6 +175,7 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
                     idx++;
                     optind++;
                 }
+
                 break;
             
             case 'h':
@@ -192,8 +193,11 @@ exit_code_t process_options(int argc, char **argv, options_t *options)
 
     if (optind <= argc)
     {
-        usage(program_name);
-        goto END;
+        if (false == options->n_flag)
+        {
+            usage(program_name);
+            goto END;
+        }
     }
 
     // // Set the directory path only if it exists

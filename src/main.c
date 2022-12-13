@@ -48,5 +48,14 @@ END:
         destroy_src_paths(src_paths);
         destroy_dest_paths(dest_paths);
     }
+
+    if (exit_code == E_SUCCESS)
+    {
+        printf("\nResult = [SUCCESS]\n");
+    }
+    else
+    {
+        printf("\nResult = [FAILURE]\n");
+    }
     return exit_code;
 }
